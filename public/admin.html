@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fuel QR Registration System</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      background:#f3f5f7;
+      color:#000;
+    }
+
+    /* HEADER */
+
+    .top-header{
+      background:#fff;
+      padding:25px 40px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid #ddd;
+    }
+
+    .top-header h1{
+      font-size:20px;
+      font-weight:600;
+    }
+
+    .logout{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      font-weight:500;
+    }
+
+    /* NAVBAR */
+
+    .navbar{
+      background:#fff;
+      padding:20px 40px;
+      display:flex;
+      gap:40px;
+      border-bottom:1px solid #ddd;
+      flex-wrap:wrap;
+    }
+
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      font-weight:500;
+    }
+
+    /* MAIN */
+
+    .container{
+      padding:50px 40px;
+    }
+
+    .welcome-title{
+      font-size:48px;
+      font-weight:700;
+      margin-bottom:5px;
+    }
+
+    .subtitle{
+      color:#6b7280;
+      font-size:20px;
+      margin-bottom:40px;
+    }
+
+    /* CARD */
+
+    .card{
+      background:#fff;
+      border-radius:20px;
+      padding:35px;
+      border:1px solid #e5e7eb;
+      overflow-x:auto;
+    }
+
+    /* TABLE TITLE */
+
+    .table-title{
+      font-size:36px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .table-subtitle{
+      color:#6b7280;
+      font-size:17px;
+      margin-bottom:35px;
+    }
+
+    /* TABLE */
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:1000px;
+    }
+
+    thead{
+      border-bottom:1px solid #e5e7eb;
+    }
+
+    th{
+      text-align:left;
+      padding:18px 20px;
+      color:#6b7280;
+      font-size:15px;
+      font-weight:600;
+    }
+
+    td{
+      padding:25px 20px;
+      font-size:16px;
+    }
+
+    .qr-text{
+      font-size:14px;
+    }
+
+    .status{
+      background:#020617;
+      color:#fff;
+      padding:6px 16px;
+      border-radius:20px;
+      font-size:14px;
+      font-weight:500;
+      display:inline-block;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:900px){
+
+      .welcome-title{
+        font-size:35px;
+      }
+
+      .table-title{
+        font-size:28px;
+      }
+
+      .navbar{
+        gap:20px;
+      }
+
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+
+  <div class="top-header">
+
+    <h1>Fuel QR Registration System</h1>
+
+    <div class="logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      Logout
+    </div>
+
+  </div>
+
+  <!-- NAVBAR -->
+
+  <div class="navbar">
+
+    <div class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      Home
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-location-dot"></i>
+      Station
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-regular fa-file"></i>
+      Fuel Type
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-regular fa-credit-card"></i>
+      Owner NIC
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-car"></i>
+      Vehicle
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-qrcode"></i>
+      QR Code
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-gauge"></i>
+      Quota
+    </div>
+
+  </div>
+
+  <!-- MAIN -->
+
+  <div class="container">
+
+    <h1 class="welcome-title">Welcome!</h1>
+
+    <p class="subtitle">
+      Manage your fuel quota registrations
+    </p>
+
+    <!-- CARD -->
+
+    <div class="card">
+
+      <h2 class="table-title">
+        👥 Registered Vehicles (1)
+      </h2>
+
+      <p class="table-subtitle">
+        All vehicles registered in the system
+      </p>
+
+      <!-- TABLE -->
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>Registration No</th>
+            <th>Owner Name</th>
+            <th>Vehicle Model</th>
+            <th>NIC</th>
+            <th>Fuel Type</th>
+            <th>Station</th>
+            <th>Quota</th>
+            <th>QR Code</th>
+            <th>Status</th>
+          </tr>
+
+        </thead>
+
+        <tbody>
+
+          <tr>
+
+            <td><strong>ABC 1234</strong></td>
+
+            <td>John doe</td>
+
+            <td>Corolla 2020</td>
+
+            <td>123456789V</td>
+
+            <td>Diesel</td>
+
+            <td>Downtown</td>
+
+            <td>40L</td>
+
+            <td class="qr-text">
+              QR-1778764472133-4cznhyhqh
+            </td>
+
+            <td>
+              <span class="status">Active</span>
+            </td>
+
+          </tr>
+
+        </tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+</body>
+</html>

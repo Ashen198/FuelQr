@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Fuel QR Registration System</title>
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome -->
+  <link rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+
+  <style>
+
+    *{
+      margin:0;
+      padding:0;
+      box-sizing:border-box;
+      font-family:'Poppins',sans-serif;
+    }
+
+    body{
+      background:#f3f5f7;
+      color:#000;
+    }
+
+    /* HEADER */
+
+    .top-header{
+      background:#fff;
+      padding:25px 40px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      border-bottom:1px solid #ddd;
+    }
+
+    .top-header h1{
+      font-size:20px;
+      font-weight:600;
+    }
+
+    .logout{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      font-weight:500;
+    }
+
+    /* NAVBAR */
+
+    .navbar{
+      background:#fff;
+      padding:20px 40px;
+      display:flex;
+      gap:40px;
+      border-bottom:1px solid #ddd;
+      flex-wrap:wrap;
+    }
+
+    .nav-item{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      cursor:pointer;
+      font-weight:500;
+    }
+
+    /* MAIN */
+
+    .container{
+      padding:50px 40px;
+    }
+
+    .welcome-title{
+      font-size:48px;
+      font-weight:700;
+      margin-bottom:5px;
+    }
+
+    .subtitle{
+      color:#6b7280;
+      font-size:20px;
+      margin-bottom:40px;
+    }
+
+    /* CARD */
+
+    .card{
+      background:#fff;
+      border-radius:20px;
+      padding:35px;
+      border:1px solid #e5e7eb;
+      overflow-x:auto;
+    }
+
+    /* TABLE TITLE */
+
+    .table-title{
+      font-size:36px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+
+    .table-subtitle{
+      color:#6b7280;
+      font-size:17px;
+      margin-bottom:35px;
+    }
+
+    /* TABLE */
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      min-width:1000px;
+    }
+
+    thead{
+      border-bottom:1px solid #e5e7eb;
+    }
+
+    th{
+      text-align:left;
+      padding:18px 20px;
+      color:#6b7280;
+      font-size:15px;
+      font-weight:600;
+    }
+
+    td{
+      padding:25px 20px;
+      font-size:16px;
+    }
+
+    .qr-text{
+      font-size:14px;
+    }
+
+    .status{
+      background:#020617;
+      color:#fff;
+      padding:6px 16px;
+      border-radius:20px;
+      font-size:14px;
+      font-weight:500;
+      display:inline-block;
+    }
+
+    /* RESPONSIVE */
+
+    @media(max-width:900px){
+
+      .welcome-title{
+        font-size:35px;
+      }
+
+      .table-title{
+        font-size:28px;
+      }
+
+      .navbar{
+        gap:20px;
+      }
+
+    }
+
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+
+  <div class="top-header">
+
+    <h1>Fuel QR Registration System</h1>
+
+    <div class="logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      Logout
+    </div>
+
+  </div>
+
+  <!-- NAVBAR -->
+
+  <div class="navbar">
+
+    <div class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      Home
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-location-dot"></i>
+      Station
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-regular fa-file"></i>
+      Fuel Type
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-regular fa-credit-card"></i>
+      Owner NIC
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-car"></i>
+      Vehicle
+    </div>
+
+    <div class="nav-item">
+      <i class="fa-solid fa-qrcode"></i>
+      QR Code
+    </div>
+
+    <div class="nav-item" >
+      <i class="fa-solid fa-gauge"></i>
+      Quota
+    </div>
+
+  </div>
+
+  <!-- MAIN -->
+
+  <div class="container">
+
+    
+
+    <div class="container">
+
+    <div class="card" style="margin-bottom: 40px;">
+      <h2 class="table-title">Add a new Quota</h2>
+      <p class="table-subtitle">Configure system-wide fuel limits for registered vehicles.</p>
+      
+      <form id="quotaForm" style="display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-end;">
+        <div style="flex: 1; min-width: 200px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Vehicle Type</label>
+          <input type="text" id="vehicleType" required placeholder="e.g., Car, Van, Three-Wheel" 
+                 style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+        </div>
+        <div style="flex: 1; min-width: 200px;">
+          <label style="display: block; margin-bottom: 8px; font-weight: 500; font-size: 14px;">Allowed Liters / Week</label>
+          <input type="number" id="allowedLiters" required placeholder="e.g., 20" 
+                 style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 15px;">
+        </div>
+        <button type="submit" 
+                style="background: #020617; color: #fff; padding: 12px 30px; border: none; border-radius: 8px; font-weight: 500; cursor: pointer; font-size: 15px; height: 48px;">
+          Save Quota
+        </button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2 class="table-title">Recently Added Quotas</h2>
+      <p class="table-subtitle">Live status tracking of fuel allowance allocations.</p>
+      
+      <table>
+        <thead>
+          <tr>
+            <th>Quota ID</th>
+            <th>Vehicle Type</th>
+            <th>Allocated Volume</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="quotaTableBody">
+          </tbody>
+      </table>
+    </div>
+
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const quotaForm = document.getElementById('quotaForm');
+      const quotaTableBody = document.getElementById('quotaTableBody');
+
+      // Function: AJAX Fetch to load active quotas into the table view
+      async function loadQuotas() {
+        try {
+          const response = await fetch('/api/quotas');
+          const quotas = await response.json();
+          
+          quotaTableBody.innerHTML = ''; // Clear stale UI rows
+
+          if(quotas.length === 0) {
+            quotaTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #6b7280;">No quotas found in the database.</td></tr>`;
+            return;
+          }
+
+          quotas.forEach(quota => {
+            const row = document.createElement('tr');
+            row.style.borderBottom = "1px solid #e5e7eb";
+            row.innerHTML = `
+              <td class="qr-text" style="color: #6b7280;">#${quota._id.substring(18)}</td>
+              <td style="font-weight: 500;">${quota.vehicleType}</td>
+              <td><strong>${quota.allowedLiters} L</strong></td>
+              <td><span class="status">${quota.status}</span></td>
+            `;
+            quotaTableBody.appendChild(row);
+          });
+        } catch (error) {
+          console.error('Error fetching quotas via REST API:', error);
+        }
+      }
+
+      // Function: AJAX Post to submit a new entry as JSON payload
+      quotaForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const payload = {
+          vehicleType: document.getElementById('vehicleType').value,
+          allowedLiters: parseInt(document.getElementById('allowedLiters').value, 10)
+        };
+
+        try {
+          const response = await fetch('/api/quotas', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+          });
+
+          if (response.ok) {
+            quotaForm.reset(); // Clear user inputs on success
+            loadQuotas();      // Refresh dashboard table instantly without page reload
+          } else {
+            const errorData = await response.json();
+            alert('Error creating allocation: ' + errorData.error);
+          }
+        } catch (error) {
+          console.error('Network exception during post request:', error);
+        }
+      });
+
+      // Initial execution sequence on document ready state
+      loadQuotas();
+    });
+  </script>
+
+  </div>
+
+</body>
+</html>
