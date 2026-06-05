@@ -257,7 +257,9 @@
 
     <script>
         $(document).ready(function () {
+
             $("#generateBtn").click(function () {
+
                 let vehicleNumber = $("#vehicleNo").val().trim();
 
                 if (vehicleNumber == "") {
@@ -265,34 +267,42 @@
                     return;
                 }
 
-                // 1. Fetch current registered vehicles
+                // 1. Fetch current registered vehicles from localStorage
                 let vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
 
-                // 2. Find the vehicle index matching the registration number
-                let vehicleIndex = vehicles.findIndex(v => v.vehicleNo.toLowerCase() === vehicleNumber.toLowerCase());
+                // Helper to strip spaces/dashes for an accurate comparison match
+                let cleanInput = vehicleNumber.replace(/[\s-]/g, '').toLowerCase();
 
+                // 2. Find the vehicle index matching the registration number
+                let vehicleIndex = vehicles.findIndex(function (v) {
+                    let cleanStoredNo = v.vehicleNo.replace(/[\s-]/g, '').toLowerCase();
+                    return cleanStoredNo === cleanInput;
+                });
+
+                // If not found, tell the admin exactly what went wrong
                 if (vehicleIndex === -1) {
-                    alert("Vehicle registration number not found in the system!");
+                    alert("Error: Vehicle registration '" + vehicleNumber + "' was not found in the system. Please register it on the home page first.");
                     return;
                 }
 
-                // 3. Generate the unique QR String
-                let generatedCode = "QR-" + Math.floor(Math.random() * 1000000000) + "-" + vehicleNumber.substring(0, 3);
+                // 3. Generate a clean random code string matching your system style
+                let generatedCode = "QR-" + Math.floor(1000000000 + Math.random() * 9000000000) + "-" + cleanInput.toUpperCase();
 
-                // 4. Update the vehicle object in the array
+                // 4. Update the array item property 
                 vehicles[vehicleIndex].qrString = generatedCode;
 
-                // 5. Save the updated list back to localStorage
+                // 5. Save the updated array back to localStorage
                 localStorage.setItem('registeredVehicles', JSON.stringify(vehicles));
 
-                // 6. Visual QR Generation
+                // 6. Clear old visual QR graphic and make the new one
                 $("#qrcode").html("");
+
                 new QRCode(document.getElementById("qrcode"), {
                     text: JSON.stringify({
                         vehicleNo: vehicles[vehicleIndex].vehicleNo,
                         fuelType: vehicles[vehicleIndex].fuelType,
                         quota: vehicles[vehicleIndex].quota,
-                        code: generatedCode
+                        qrCodeString: generatedCode
                     }),
                     width: 250,
                     height: 250,
@@ -301,8 +311,9 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                alert("QR Code generated and assigned to " + vehicleNumber);
+                alert("Success! QR Code generated and linked to " + vehicles[vehicleIndex].vehicleNo);
             });
+
         });
     </script>
 
