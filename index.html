@@ -346,10 +346,9 @@
           return;
         }
 
+        // Step 1: Render all structural HTML rows first
         vehicles.forEach(function (vehicle, index) {
           const isNotAvailable = !vehicle.qrString || vehicle.qrString.trim() === "" || vehicle.qrString === "Not Available";
-
-          // Create a unique ID element container for each row's QR code graphic rendering
           const qrTargetId = `table-qr-${index}`;
 
           const qrDisplay = isNotAvailable
@@ -365,27 +364,36 @@
               <td>${vehicle.fuelType}</td>
               <td>${vehicle.station}</td>
               <td>${vehicle.quota}L</td>
-              <td style="text-align: center; width: 120px;">${qrDisplay}</td>
+              <td style="text-align: center; vertical-align: middle; width: 120px;">${qrDisplay}</td>
               <td><span class="status-badge">Active</span></td>
           </tr>
       `;
           $('#vehicleTableBody').append(rowHtml);
+        });
 
-          // If the QR code data is available, generate the canvas element on the spot
+        // Step 2: Now that everything is firmly in the DOM, generate the visual QR elements safely
+        vehicles.forEach(function (vehicle, index) {
+          const isNotAvailable = !vehicle.qrString || vehicle.qrString.trim() === "" || vehicle.qrString === "Not Available";
+
           if (!isNotAvailable) {
-            new QRCode(document.getElementById(qrTargetId), {
-              text: JSON.stringify({
-                vehicleNo: vehicle.vehicleNo,
-                fuelType: vehicle.fuelType,
-                quota: vehicle.quota,
-                qrCodeString: vehicle.qrString
-              }),
-              width: 80,  // Compact row dimensions for clean alignment matching your image layout
-              height: 80,
-              colorDark: "#000000",
-              colorLight: "#ffffff",
-              correctLevel: QRCode.CorrectLevel.M
-            });
+            const qrTargetId = `table-qr-${index}`;
+            const targetElement = document.getElementById(qrTargetId);
+
+            if (targetElement) {
+              new QRCode(targetElement, {
+                text: JSON.stringify({
+                  vehicleNo: vehicle.vehicleNo,
+                  fuelType: vehicle.fuelType,
+                  quota: vehicle.quota,
+                  qrCodeString: vehicle.qrString
+                }),
+                width: 70,  // Clean, compact row dimension size matching your layout metrics
+                height: 70,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.M
+              });
+            }
           }
         });
       }
