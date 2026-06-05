@@ -10,23 +10,34 @@ const app = express();
 
 // Middleware
 app.use(express.json());
-// Serve static files from multiple directories
+
+// Serve static files from specified directories
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Nilakshi', 'Dimanthi')));
-app.use(express.static(__dirname)); // To serve index.html and admin.html from root
+
+// Explicit routes for root files to avoid serving the entire directory
+app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
+app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
 // Redirect root to login page
 app.get('/', (req, res) => {
+  console.log(">>> Root URL accessed - serving login.html");
   res.sendFile(path.join(__dirname, 'Nilakshi', 'Dimanthi', 'login.html'));
 });
 
-// MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/fuelQrDB')
+// MongoDB Connection with timeout handling
+console.log(">>> Connecting to MongoDB...");
+mongoose.connect('mongodb://localhost:27017/fuelQrDB', {
+    serverSelectionTimeoutMS: 5000 // Fail fast if MongoDB is not running
+})
   .then(() => {
-    console.log('Connected securely to MongoDB.');
-    migrateUsers(); // Run migration on startup
+    console.log('>>> Connected securely to MongoDB.');
+    migrateUsers(); 
   })
-  .catch(err => console.error('Database connection error:', err));
+  .catch(err => {
+    console.error('>>> DATABASE CONNECTION ERROR:', err.message);
+    console.error('>>> Please ensure MongoDB is running on your machine (localhost:27017)');
+  });
 
 // --- MIGRATION LOGIC ---
 const JSON_PATH = path.join(__dirname, 'Nilakshi', 'Dimanthi', 'signup.json');
@@ -36,23 +47,25 @@ async function migrateUsers() {
     if (fs.existsSync(JSON_PATH)) {
       const data = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
       if (data.users && Array.isArray(data.users)) {
+        console.log(`>>> Found ${data.users.length} users in signup.json for migration...`);
         for (const user of data.users) {
           const exists = await User.findOne({ email: user.email });
           if (!exists) {
+            const role = user.email === 'admin@fuel.com' ? 'admin' : 'user';
             const newUser = new User({
               fullname: user.fullname,
               email: user.email,
               password: user.password,
-              role: user.email === 'admin@fuel.com' ? 'admin' : 'user'
+              role: role
             });
             await newUser.save();
-            console.log(`Migrated user: ${user.email}`);
+            console.log(`>>> Migrated user: ${user.email} (${role})`);
           }
         }
       }
     }
   } catch (err) {
-    console.error('Migration error:', err);
+    console.error('>>> Migration error:', err.message);
   }
 }
 
@@ -70,7 +83,7 @@ function updateJson(newUser) {
         });
         fs.writeFileSync(JSON_PATH, JSON.stringify(data, null, 2));
     } catch (err) {
-        console.error('Error updating JSON:', err);
+        console.error('>>> Error updating JSON:', err.message);
     }
 }
 
@@ -86,7 +99,6 @@ app.post('/api/signup', async (req, res) => {
     const newUser = new User({ fullname, email, password, role });
     await newUser.save();
     
-    // Also update JSON as requested
     updateJson({ fullname, email, password });
 
     res.status(201).json({ message: 'User created successfully' });
@@ -98,6 +110,7 @@ app.post('/api/signup', async (req, res) => {
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log(`>>> Login attempt for: ${email}`);
     const user = await User.findOne({ email, password });
 
     if (!user) {
@@ -167,4 +180,7 @@ app.get('/api/quotas', async (req, res) => {
 
 // Start Server
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+    console.log(`>>> Server is running!`);
+    console.log(`>>> Local Access: http://localhost:${PORT}`);
+});
