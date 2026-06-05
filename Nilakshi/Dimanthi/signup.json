@@ -1,0 +1,25 @@
+{
+  "users": [
+    {
+      "_id": "sy8uv7lac",
+      "fullname": "Test User",
+      "email": "test2@example.com",
+      "password": "123",
+      "createdAt": "2026-06-05T07:32:00.468Z"
+    },
+    {
+      "_id": "69ihnfj87",
+      "fullname": "nilu",
+      "email": "nilu@gmail.com",
+      "password": "123",
+      "createdAt": "2026-06-05T07:37:06.563Z"
+    },
+    {
+      "_id": "jdbcqxtv1",
+      "fullname": "ranudi",
+      "email": "ranu@gmail.com",
+      "password": "123",
+      "createdAt": "2026-06-05T07:45:57.336Z"
+    }
+  ]
+}

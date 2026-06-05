@@ -48,24 +48,6 @@
       font-weight: 500;
     }
 
-    .navbar {
-      background: #fff;
-      padding: 20px 40px;
-      display: flex;
-      gap: 40px;
-      border-bottom: 1px solid #ddd;
-    }
-
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      cursor: pointer;
-      font-weight: 500;
-      color: #000;
-      text-decoration: none;
-    }
-
     .container {
       padding: 50px 40px;
       display: flex;
@@ -149,7 +131,6 @@
       background: #000;
     }
 
-    /* Table Component Custom Styling matching your image */
     .table-responsive {
       width: 100%;
       overflow-x: auto;
@@ -192,26 +173,13 @@
       display: inline-block;
     }
 
-    .qr-text-string {
-      font-family: monospace;
-      color: #4b5563;
-      font-size: 14px;
-    }
-
     @media(max-width:900px) {
-      .navbar {
-        flex-wrap: wrap;
-        gap: 20px;
-      }
-
       .form-grid {
         grid-template-columns: 1fr;
       }
-
       .welcome-title {
         font-size: 38px;
       }
-
       .card-title {
         font-size: 30px;
       }
@@ -221,31 +189,24 @@
 
 <body>
 
+  <script>
+    // Session Check
+    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    if (!currentUser) {
+      window.location.href = '/';
+    }
+  </script>
+
   <div class="top-header">
     <h1>Fuel QR Registration System</h1>
-    <div class="logout">
+    <div class="logout" id="logoutBtn">
       <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
-    </div>
-  </div>
-
-  <div class="navbar">
-    <a href="index.html" class="nav-item">
-      <i class="fa-solid fa-house"></i> Home
-    </a>
-    <div class="nav-item">
-      <i class="fa-solid fa-car"></i> Vehicle
-    </div>
-    <a href="public/qrgen.html" class="nav-item">
-      <i class="fa-solid fa-qrcode"></i> QR Code
-    </a>
-    <div class="nav-item">
-      <i class="fa-solid fa-gauge"></i> Quota
     </div>
   </div>
 
   <div class="container">
     <div>
-      <h1 class="welcome-title">Welcome!</h1>
+      <h1 class="welcome-title">Welcome, <span id="userName">User</span>!</h1>
       <p class="subtitle">Manage your fuel quota registrations</p>
     </div>
 
@@ -279,7 +240,7 @@
           </div>
           <div class="form-group">
             <label>Email</label>
-            <input type="email" id="email" placeholder="abc@gmail.com" required>
+            <input type="email" id="email" placeholder="abc@gmail.com" required readonly>
           </div>
           <div class="form-group">
             <label>Fuel Type</label>
@@ -309,9 +270,9 @@
 
     <div class="card" id="registeredVehiclesCard">
       <h2 class="card-title" style="font-size: 32px; display: flex; align-items: center; gap: 15px;">
-        <i class="fa-solid fa-users" style="color: #4c1d95;"></i> Registered Vehicles (<span id="vehicleCount">0</span>)
+        <i class="fa-solid fa-users" style="color: #4c1d95;"></i> Your Registered Vehicles (<span id="vehicleCount">0</span>)
       </h2>
-      <p class="card-subtitle" style="margin-bottom: 20px;">All vehicles registered in the system</p>
+      <p class="card-subtitle" style="margin-bottom: 20px;">Your vehicles registered in the system</p>
 
       <div class="table-responsive">
         <table class="vehicle-table">
@@ -337,112 +298,107 @@
 
   <script>
     $(document).ready(function () {
+      const user = JSON.parse(localStorage.getItem('currentUser'));
+      $('#userName').text(user.fullname);
+      $('#email').val(user.email);
+
+      $('#logoutBtn').on('click', function() {
+        localStorage.removeItem('currentUser');
+        window.location.href = '/';
+      });
 
       function loadVehicles() {
-        const vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
-        $('#vehicleCount').text(vehicles.length);
-        $('#vehicleTableBody').empty();
+        $.ajax({
+          url: `/api/vehicles?email=${user.email}&role=${user.role}`,
+          method: 'GET',
+          success: function (vehicles) {
+            $('#vehicleCount').text(vehicles.length);
+            $('#vehicleTableBody').empty();
 
-        if (vehicles.length === 0) {
-          $('#vehicleTableBody').append(`<tr><td colspan="9" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
-          return;
-        }
-
-        // 1. Build table rows structurally first
-        vehicles.forEach(function (vehicle, index) {
-          const isNotAvailable = !vehicle.qrString || vehicle.qrString.trim() === "" || vehicle.qrString === "Not Available";
-          const qrTargetId = `table-qr-${index}`;
-
-          const qrDisplay = isNotAvailable
-            ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
-            : `<div id="${qrTargetId}" class="qr-canvas-container" style="display: flex; justify-content: center; align-items: center; min-height: 70px;"></div>`;
-
-          const rowHtml = `
-          <tr>
-              <td class="reg-no-bold">${vehicle.vehicleNo}</td>
-              <td>${vehicle.ownerName}</td>
-              <td>${vehicle.vehicleModel}</td>
-              <td>${vehicle.nic}</td>
-              <td>${vehicle.fuelType}</td>
-              <td>${vehicle.station}</td>
-              <td>${vehicle.quota}L</td>
-              <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
-              <td><span class="status-badge">Active</span></td>
-          </tr>
-      `;
-          $('#vehicleTableBody').append(rowHtml);
-        });
-
-        // 2. Double check if QRCode library is present before rendering canvas
-        if (typeof QRCode === "undefined") {
-          console.warn("QRCode library not loaded yet. Retrying in 100ms...");
-          setTimeout(loadVehicles, 100);
-          return;
-        }
-
-        // 3. Inject visual QR blocks safely into the mounted DOM wrappers
-        vehicles.forEach(function (vehicle, index) {
-          const isNotAvailable = !vehicle.qrString || vehicle.qrString.trim() === "" || vehicle.qrString === "Not Available";
-
-          if (!isNotAvailable) {
-            const qrTargetId = `table-qr-${index}`;
-            const targetElement = document.getElementById(qrTargetId);
-
-            if (targetElement) {
-              // Clear any accidental duplicate text injections
-              targetElement.innerHTML = "";
-
-              try {
-                new QRCode(targetElement, {
-                  text: JSON.stringify({
-                    vehicleNo: vehicle.vehicleNo,
-                    fuelType: vehicle.fuelType,
-                    quota: vehicle.quota,
-                    qrCodeString: vehicle.qrString
-                  }),
-                  width: 70,
-                  height: 70,
-                  colorDark: "#000000",
-                  colorLight: "#ffffff",
-                  correctLevel: QRCode.CorrectLevel.M
-                });
-              } catch (err) {
-                console.error("Error drawing QR on row " + index + ":", err);
-              }
+            if (vehicles.length === 0) {
+              $('#vehicleTableBody').append(`<tr><td colspan="9" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
+              return;
             }
+
+            vehicles.forEach(function (vehicle, index) {
+              const isNotAvailable = !vehicle.qrString || vehicle.qrString === "Not Available";
+              const qrTargetId = `table-qr-${index}`;
+
+              const qrDisplay = isNotAvailable
+                ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
+                : `<div id="${qrTargetId}" style="display: flex; justify-content: center; align-items: center; min-height: 70px;"></div>`;
+
+              const rowHtml = `
+                <tr>
+                    <td class="reg-no-bold">${vehicle.vehicleNo}</td>
+                    <td>${vehicle.ownerName}</td>
+                    <td>${vehicle.vehicleModel}</td>
+                    <td>${vehicle.nic}</td>
+                    <td>${vehicle.fuelType}</td>
+                    <td>${vehicle.station}</td>
+                    <td>${vehicle.quota}L</td>
+                    <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
+                    <td><span class="status-badge">Active</span></td>
+                </tr>
+              `;
+              $('#vehicleTableBody').append(rowHtml);
+
+              if (!isNotAvailable) {
+                setTimeout(() => {
+                    const targetElement = document.getElementById(qrTargetId);
+                    if (targetElement) {
+                        new QRCode(targetElement, {
+                        text: JSON.stringify({
+                            vehicleNo: vehicle.vehicleNo,
+                            fuelType: vehicle.fuelType,
+                            quota: vehicle.quota,
+                            qrCodeString: vehicle.qrString
+                        }),
+                        width: 70,
+                        height: 70,
+                        colorDark: "#000000",
+                        colorLight: "#ffffff",
+                        correctLevel: QRCode.CorrectLevel.M
+                        });
+                    }
+                }, 100);
+              }
+            });
           }
         });
       }
 
-      // Handle Form Registrations
       $('#vehicleRegForm').on('submit', function (e) {
         e.preventDefault();
 
-        const newVehicle = {
+        const formData = {
           vehicleNo: $('#vehicleNo').val().trim(),
           ownerName: $('#firstName').val().trim() + ' ' + $('#lastName').val().trim(),
           vehicleModel: $('#vehicleModel').val().trim(),
           nic: $('#nic').val().trim(),
+          ownerEmail: user.email,
           fuelType: $('#fuelType').val(),
           station: $('#station').val(),
           quota: $('#quota').val().trim(),
-          qrString: "Not Available"
         };
 
-        const vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
-        vehicles.push(newVehicle);
-        localStorage.setItem('registeredVehicles', JSON.stringify(vehicles));
-
-        loadVehicles();
-        this.reset();
+        $.ajax({
+          url: '/api/vehicles',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(formData),
+          success: function () {
+            loadVehicles();
+            $('#vehicleRegForm')[0].reset();
+            $('#email').val(user.email);
+            alert('Vehicle Registered Successfully!');
+          },
+          error: function(xhr) {
+            alert('Error: ' + (xhr.responseJSON?.details || 'Registration failed'));
+          }
+        });
       });
 
-      // Safe window execution fallback loop
-      $(window).on('load', function () {
-        loadVehicles();
-      });
-
-      // Immediate fallback trigger execution call
       loadVehicles();
     });
   </script>
