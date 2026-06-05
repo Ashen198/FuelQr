@@ -127,9 +127,6 @@
 
     <script>
         $(document).ready(function () {
-            // Debugging check to see what is currently sitting in the browser storage memory on load
-            console.log("Current LocalStorage Data:", localStorage.getItem('registeredVehicles'));
-
             $("#generateBtn").click(function () {
                 let vehicleNumber = $("#vehicleNo").val().trim();
 
@@ -138,7 +135,6 @@
                     return;
                 }
 
-                // 1. Fetch current registered vehicles from localStorage
                 let vehiclesData = localStorage.getItem('registeredVehicles');
                 let vehicles = [];
 
@@ -146,32 +142,28 @@
                     vehicles = JSON.parse(vehiclesData);
                 }
 
-                // Clean string helper to avoid typos breaking matches
                 let cleanInput = vehicleNumber.replace(/[\s-]/g, '').toLowerCase();
 
-                // 2. Find vehicle index 
                 let vehicleIndex = vehicles.findIndex(function (v) {
                     let cleanStoredNo = v.vehicleNo.replace(/[\s-]/g, '').toLowerCase();
                     return cleanStoredNo === cleanInput;
                 });
 
-                // 3. Fallback/Error Handler
                 if (vehicleIndex === -1) {
-                    alert("Error: Vehicle '" + vehicleNumber + "' not found.\n\nMake sure you registered it on the Home screen first with this exact number!");
-                    console.log("Looked for clean string:", cleanInput, "Available vehicles array:", vehicles);
+                    alert("Error: Vehicle '" + vehicleNumber + "' not found.\n\nMake sure you registered it on the Home screen first!");
                     return;
                 }
 
-                // 4. Generate random unique string sequence 
+                // Generate a random payload tracking code
                 let generatedCode = "QR-" + Math.floor(1000000000 + Math.random() * 9000000000) + "-" + cleanInput.toUpperCase();
 
-                // 5. Update the dataset value mapping
+                // Update dataset fields property values
                 vehicles[vehicleIndex].qrString = generatedCode;
 
-                // 6. Save data explicitly back to memory
+                // Save back to storage array mapping key container
                 localStorage.setItem('registeredVehicles', JSON.stringify(vehicles));
 
-                // 7. Clear old graphical canvas rendering and populate new code canvas
+                // Clear and draw the large master admin display panel preview graphic
                 $("#qrcode").html("");
                 new QRCode(document.getElementById("qrcode"), {
                     text: JSON.stringify({
@@ -187,7 +179,7 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                alert("Success! QR Code generated and saved for " + vehicles[vehicleIndex].vehicleNo);
+                alert("Success! QR Code graphics generated and assigned to " + vehicles[vehicleIndex].vehicleNo);
             });
         });
     </script>
