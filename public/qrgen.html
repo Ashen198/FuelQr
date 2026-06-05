@@ -6,21 +6,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght=300;400;500;600;700&display=swap"
         rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
-
 
     <title>QR Generator</title>
 
-    <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 
-    <!-- QR Code Library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
 
     <style>
@@ -74,7 +69,6 @@
             font-weight: 500;
         }
 
-
         .custom-navbar {
             background: #fff;
             padding: 20px 40px;
@@ -92,112 +86,6 @@
             color: #000;
             text-decoration: none;
         }
-
-
-        .container {
-            padding: 50px 40px;
-        }
-
-        .welcome-title {
-            font-size: 50px;
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .subtitle {
-            color: #6b7280;
-            font-size: 20px;
-            margin-bottom: 40px;
-        }
-
-
-        .card {
-            background: #fff;
-            border-radius: 20px;
-            padding: 40px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .card-title {
-            font-size: 40px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .card-subtitle {
-            color: #6b7280;
-            margin-bottom: 40px;
-            font-size: 18px;
-        }
-
-
-        .form-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 40px 80px;
-        }
-
-        .form-group label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 16px;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            font-size: 17px;
-            outline: none;
-            background: #fff;
-        }
-
-        .form-group input:focus,
-        .form-group select:focus {
-            border-color: #2563eb;
-        }
-
-
-        .btn {
-            margin-top: 40px;
-            padding: 16px 35px;
-            background: #111827;
-            color: #fff;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:hover {
-            background: #000;
-        }
-
-
-        @media(max-width:900px) {
-
-            .custom-navbar {
-                flex-wrap: wrap;
-                gap: 20px;
-            }
-
-            .form-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .welcome-title {
-                font-size: 38px;
-            }
-
-            .card-title {
-                font-size: 30px;
-            }
-
-        }
     </style>
 </head>
 
@@ -205,61 +93,44 @@
 
     <div class="top-header">
         <h1>Fuel QR Registration System</h1>
-
         <div class="logout">
-            <i class="fa-solid fa-arrow-right-from-bracket"></i>
-            Logout
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Logout
         </div>
-
     </div>
-
 
     <div class="custom-navbar">
-
         <a href="../index.html" class="custom-nav-item">
-            <i class="fa-solid fa-house"></i>
-            Home
+            <i class="fa-solid fa-house"></i> Home
         </a>
-
         <div class="custom-nav-item">
-            <i class="fa-solid fa-car"></i>
-            Vehicle
+            <i class="fa-solid fa-car"></i> Vehicle
         </div>
-
         <a href="qrgen.html" class="custom-nav-item">
-            <i class="fa-solid fa-qrcode"></i>
-            QR Code
+            <i class="fa-solid fa-qrcode"></i> QR Code
         </a>
-
         <div class="custom-nav-item">
-            <i class="fa-solid fa-gauge"></i>
-            Quota
+            <i class="fa-solid fa-gauge"></i> Quota
         </div>
-
     </div>
 
-
     <div class="box">
-
-        <h2 class="text-center mb-4">
-            Vehicle QR Generator
-        </h2>
+        <h2 class="text-center mb-4">Vehicle QR Generator</h2>
 
         <input type="text" id="vehicleNo" class="form-control mb-3" placeholder="Enter Vehicle Registration Number">
 
-        <button class="btn btn-primary w-100" id="generateBtn" style="background: Black, border-color: Black">
+        <button class="btn w-100" id="generateBtn" style="background-color: #111827; color: white;">
             Generate QR Code
         </button>
 
         <div id="qrcode"></div>
-
     </div>
 
     <script>
         $(document).ready(function () {
+            // Debugging check to see what is currently sitting in the browser storage memory on load
+            console.log("Current LocalStorage Data:", localStorage.getItem('registeredVehicles'));
 
             $("#generateBtn").click(function () {
-
                 let vehicleNumber = $("#vehicleNo").val().trim();
 
                 if (vehicleNumber == "") {
@@ -268,35 +139,40 @@
                 }
 
                 // 1. Fetch current registered vehicles from localStorage
-                let vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
+                let vehiclesData = localStorage.getItem('registeredVehicles');
+                let vehicles = [];
 
-                // Helper to strip spaces/dashes for an accurate comparison match
+                if (vehiclesData) {
+                    vehicles = JSON.parse(vehiclesData);
+                }
+
+                // Clean string helper to avoid typos breaking matches
                 let cleanInput = vehicleNumber.replace(/[\s-]/g, '').toLowerCase();
 
-                // 2. Find the vehicle index matching the registration number
+                // 2. Find vehicle index 
                 let vehicleIndex = vehicles.findIndex(function (v) {
                     let cleanStoredNo = v.vehicleNo.replace(/[\s-]/g, '').toLowerCase();
                     return cleanStoredNo === cleanInput;
                 });
 
-                // If not found, tell the admin exactly what went wrong
+                // 3. Fallback/Error Handler
                 if (vehicleIndex === -1) {
-                    alert("Error: Vehicle registration '" + vehicleNumber + "' was not found in the system. Please register it on the home page first.");
+                    alert("Error: Vehicle '" + vehicleNumber + "' not found.\n\nMake sure you registered it on the Home screen first with this exact number!");
+                    console.log("Looked for clean string:", cleanInput, "Available vehicles array:", vehicles);
                     return;
                 }
 
-                // 3. Generate a clean random code string matching your system style
+                // 4. Generate random unique string sequence 
                 let generatedCode = "QR-" + Math.floor(1000000000 + Math.random() * 9000000000) + "-" + cleanInput.toUpperCase();
 
-                // 4. Update the array item property 
+                // 5. Update the dataset value mapping
                 vehicles[vehicleIndex].qrString = generatedCode;
 
-                // 5. Save the updated array back to localStorage
+                // 6. Save data explicitly back to memory
                 localStorage.setItem('registeredVehicles', JSON.stringify(vehicles));
 
-                // 6. Clear old visual QR graphic and make the new one
+                // 7. Clear old graphical canvas rendering and populate new code canvas
                 $("#qrcode").html("");
-
                 new QRCode(document.getElementById("qrcode"), {
                     text: JSON.stringify({
                         vehicleNo: vehicles[vehicleIndex].vehicleNo,
@@ -311,9 +187,8 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                alert("Success! QR Code generated and linked to " + vehicles[vehicleIndex].vehicleNo);
+                alert("Success! QR Code generated and saved for " + vehicles[vehicleIndex].vehicleNo);
             });
-
         });
     </script>
 
