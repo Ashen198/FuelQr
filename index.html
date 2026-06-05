@@ -11,6 +11,12 @@
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+
+  <!-- QR Code Library -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
   <style>
     * {
       margin: 0;
@@ -219,7 +225,7 @@
 
     <!-- CARD -->
 
-    <div class="card">
+    <div class="card" id="registrationFormCard">
 
       <h2 class="card-title">
         <i class="fa-solid fa-plus"></i>
@@ -232,62 +238,62 @@
 
       <!-- FORM -->
 
-      <form>
+      <form id="vehicleRegForm">
 
         <div class="form-grid">
 
           <div class="form-group">
             <label>Vehicle Registration No</label>
-            <input type="text" placeholder="ABC-1234">
+            <input type="text" id="vehicleNo" placeholder="ABC-1234" required>
           </div>
 
           <div class="form-group">
             <label>Vehicle Model</label>
-            <input type="text" placeholder="Toyota Corolla 2020">
+            <input type="text" id="vehicleModel" placeholder="Toyota Corolla 2020" required>
           </div>
 
           <div class="form-group">
             <label>First Name</label>
-            <input type="text" placeholder="John">
+            <input type="text" id="firstName" placeholder="John" required>
           </div>
 
           <div class="form-group">
             <label>Last Name</label>
-            <input type="text" placeholder="Doe">
+            <input type="text" id="lastName" placeholder="Doe" required>
           </div>
 
           <div class="form-group">
             <label>Owner NIC</label>
-            <input type="text" placeholder="123456789V">
+            <input type="text" id="nic" placeholder="123456789V" required>
           </div>
           <div class="form-group">
             <label>Email</label>
-            <input type="text" placeholder="abc@gmail.com">
+            <input type="email" id="email" placeholder="abc@gmail.com" required>
           </div>
 
           <div class="form-group">
             <label>Fuel Type</label>
 
-            <select>
-              <option>Select fuel type</option>
-              <option>Petrol</option>
-              <option>Diesel</option>
+            <select id="fuelType" required>
+              <option value="">Select fuel type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
             </select>
           </div>
 
           <div class="form-group">
             <label>Nearest Fuel Station</label>
 
-            <select>
-              <option>Select station</option>
-              <option>IOC Station</option>
-              <option>Ceypetco</option>
+            <select id="station" required>
+              <option value="">Select station</option>
+              <option value="IOC Station">IOC Station</option>
+              <option value="Ceypetco">Ceypetco</option>
             </select>
           </div>
 
           <div class="form-group">
             <label>Weekly Fuel Quota (Liters)</label>
-            <input type="number" placeholder="40">
+            <input type="number" id="quota" placeholder="40" required min="1">
           </div>
 
         </div>
@@ -298,7 +304,132 @@
 
     </div>
 
+    <!-- SUCCESS DETAILS CONTAINER (initially hidden) -->
+    <div id="successDetailsContainer" style="display: none;">
+      
+      <!-- Back button / Register New Vehicle button on top -->
+      <button class="btn" id="btnNewVehicle" style="margin-top: 0; margin-bottom: 30px; background: #111827; color: #fff;">
+        <i class="fa-solid fa-plus" style="margin-right: 8px;"></i>
+        Register New Vehicle
+      </button>
+
+      <!-- CARD showing details -->
+      <div class="card">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 30px;">
+          <div style="flex: 2; min-width: 300px;">
+            <h2 class="card-title" style="color: #10b981; font-size: 32px; margin-bottom: 25px; display: flex; align-items: center; gap: 12px;">
+              <i class="fa-solid fa-circle-check"></i> Registration Successful!
+            </h2>
+            <div class="details-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px 40px;">
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Vehicle Registration No</label>
+                <div id="displayVehicleNo" style="font-size: 20px; font-weight: 700; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Vehicle Model</label>
+                <div id="displayVehicleModel" style="font-size: 18px; font-weight: 500; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Owner Name</label>
+                <div id="displayOwnerName" style="font-size: 18px; font-weight: 500; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Owner NIC</label>
+                <div id="displayNic" style="font-size: 18px; font-weight: 500; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Email Address</label>
+                <div id="displayEmail" style="font-size: 18px; font-weight: 500; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Fuel Type</label>
+                <div id="displayFuelType" style="font-size: 18px; font-weight: 500; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Fuel Station</label>
+                <div id="displayStation" style="font-size: 18px; font-weight: 500; color: #111827; margin-top: 5px;"></div>
+              </div>
+              <div>
+                <label style="font-weight: 600; color: #6b7280; font-size: 14px; text-transform: uppercase;">Weekly Quota</label>
+                <div id="displayQuota" style="font-size: 20px; font-weight: 700; color: #2563eb; margin-top: 5px;"></div>
+              </div>
+            </div>
+          </div>
+          <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: #f8fafc; border-radius: 15px; padding: 30px; border: 1px dashed #cbd5e1; min-width: 250px; align-self: center;">
+            <div id="displayQrCode"></div>
+            <p style="margin-top: 15px; font-size: 14px; color: #6b7280; font-weight: 500; text-align: center;">Scan to verify weekly fuel quota</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
   </div>
+
+  <script>
+    $(document).ready(function() {
+      // Handle form submission
+      $('#vehicleRegForm').on('submit', function(e) {
+        e.preventDefault();
+
+        // Retrieve form values
+        const vehicleNo = $('#vehicleNo').val().trim();
+        const vehicleModel = $('#vehicleModel').val().trim();
+        const firstName = $('#firstName').val().trim();
+        const lastName = $('#lastName').val().trim();
+        const nic = $('#nic').val().trim();
+        const email = $('#email').val().trim();
+        const fuelType = $('#fuelType').val();
+        const station = $('#station').val();
+        const quota = $('#quota').val().trim();
+
+        // Populate display elements
+        $('#displayVehicleNo').text(vehicleNo);
+        $('#displayVehicleModel').text(vehicleModel);
+        $('#displayOwnerName').text(firstName + ' ' + lastName);
+        $('#displayNic').text(nic);
+        $('#displayEmail').text(email);
+        $('#displayFuelType').text(fuelType);
+        $('#displayStation').text(station);
+        $('#displayQuota').text(quota + ' Liters');
+
+        // Clear previous QR Code if any
+        $('#displayQrCode').html('');
+
+        // Generate QR Code
+        new QRCode(document.getElementById("displayQrCode"), {
+          text: JSON.stringify({
+            vehicleNo: vehicleNo,
+            ownerName: firstName + ' ' + lastName,
+            nic: nic,
+            email: email,
+            fuelType: fuelType,
+            station: station,
+            quota: parseInt(quota, 10)
+          }),
+          width: 200,
+          height: 200,
+          colorDark: "#000000",
+          colorLight: "#ffffff",
+          correctLevel: QRCode.CorrectLevel.H
+        });
+
+        // Hide form card and show success details
+        $('#registrationFormCard').hide();
+        $('#successDetailsContainer').fadeIn();
+      });
+
+      // Handle "Register New Vehicle" button click
+      $('#btnNewVehicle').on('click', function() {
+        // Reset the form
+        $('#vehicleRegForm')[0].reset();
+
+        // Hide success details and show form card
+        $('#successDetailsContainer').hide();
+        $('#registrationFormCard').fadeIn();
+      });
+    });
+  </script>
 
 </body>
 
