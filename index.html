@@ -337,7 +337,6 @@
   <script>
     $(document).ready(function () {
       function loadVehicles() {
-        // Retrieve data from localStorage
         const vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
         $('#vehicleCount').text(vehicles.length);
         $('#vehicleTableBody').empty();
@@ -348,24 +347,26 @@
         }
 
         vehicles.forEach(function (vehicle) {
-          // Check if QR is available; if not, show "Not Available" in a styled span
-          const qrDisplay = vehicle.qrString === "Not Available"
-            ? '<span style="color: #ef4444; font-style: italic;">Not Available</span>'
+          // Normalize check: If qrString is missing, blank, or explicitly "Not Available"
+          const isNotAvailable = !vehicle.qrString || vehicle.qrString.trim() === "" || vehicle.qrString === "Not Available";
+
+          const qrDisplay = isNotAvailable
+            ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
             : `<span class="qr-text-string" style="color: #2563eb; font-weight: 600;">${vehicle.qrString}</span>`;
 
           const rowHtml = `
-                <tr>
-                    <td class="reg-no-bold">${vehicle.vehicleNo}</td>
-                    <td>${vehicle.ownerName}</td>
-                    <td>${vehicle.vehicleModel}</td>
-                    <td>${vehicle.nic}</td>
-                    <td>${vehicle.fuelType}</td>
-                    <td>${vehicle.station}</td>
-                    <td>${vehicle.quota}L</td>
-                    <td>${qrDisplay}</td>
-                    <td><span class="status-badge">Active</span></td>
-                </tr>
-            `;
+          <tr>
+              <td class="reg-no-bold">${vehicle.vehicleNo}</td>
+              <td>${vehicle.ownerName}</td>
+              <td>${vehicle.vehicleModel}</td>
+              <td>${vehicle.nic}</td>
+              <td>${vehicle.fuelType}</td>
+              <td>${vehicle.station}</td>
+              <td>${vehicle.quota}L</td>
+              <td>${qrDisplay}</td>
+              <td><span class="status-badge">Active</span></td>
+          </tr>
+      `;
           $('#vehicleTableBody').append(rowHtml);
         });
       }
@@ -381,7 +382,7 @@
           fuelType: $('#fuelType').val(),
           station: $('#station').val(),
           quota: $('#quota').val().trim(),
-          qrString: "Not Available" // Default status for new registrations
+          qrString: "Not Available"
         };
 
         const vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
@@ -393,7 +394,7 @@
       });
 
       loadVehicles();
-    });
+    }); 
   </script>
 
 </body>
