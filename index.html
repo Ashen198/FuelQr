@@ -346,13 +346,15 @@
           return;
         }
 
-        vehicles.forEach(function (vehicle) {
-          // Normalize check: If qrString is missing, blank, or explicitly "Not Available"
+        vehicles.forEach(function (vehicle, index) {
           const isNotAvailable = !vehicle.qrString || vehicle.qrString.trim() === "" || vehicle.qrString === "Not Available";
+
+          // Create a unique ID element container for each row's QR code graphic rendering
+          const qrTargetId = `table-qr-${index}`;
 
           const qrDisplay = isNotAvailable
             ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
-            : `<span class="qr-text-string" style="color: #2563eb; font-weight: 600;">${vehicle.qrString}</span>`;
+            : `<div id="${qrTargetId}" style="display: flex; justify-content: center;"></div>`;
 
           const rowHtml = `
           <tr>
@@ -363,11 +365,28 @@
               <td>${vehicle.fuelType}</td>
               <td>${vehicle.station}</td>
               <td>${vehicle.quota}L</td>
-              <td>${qrDisplay}</td>
+              <td style="text-align: center; width: 120px;">${qrDisplay}</td>
               <td><span class="status-badge">Active</span></td>
           </tr>
       `;
           $('#vehicleTableBody').append(rowHtml);
+
+          // If the QR code data is available, generate the canvas element on the spot
+          if (!isNotAvailable) {
+            new QRCode(document.getElementById(qrTargetId), {
+              text: JSON.stringify({
+                vehicleNo: vehicle.vehicleNo,
+                fuelType: vehicle.fuelType,
+                quota: vehicle.quota,
+                qrCodeString: vehicle.qrString
+              }),
+              width: 80,  // Compact row dimensions for clean alignment matching your image layout
+              height: 80,
+              colorDark: "#000000",
+              colorLight: "#ffffff",
+              correctLevel: QRCode.CorrectLevel.M
+            });
+          }
         });
       }
 
@@ -394,7 +413,7 @@
       });
 
       loadVehicles();
-    }); 
+    });
   </script>
 
 </body>
