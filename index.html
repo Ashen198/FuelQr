@@ -336,85 +336,62 @@
 
   <script>
     $(document).ready(function () {
-      // Helper function to generate a fake unique QR string matching your screenshot format
-      function generateMockQRString() {
-        const randHex = Math.random().toString(16).substring(2, 12);
-        return `QR-${Math.floor(1000000000000 + Math.random() * 9000000000000)}-${randHex}`;
-      }
-
-      // Function to load elements from localStorage onto the table view
       function loadVehicles() {
+        // Retrieve data from localStorage
         const vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
         $('#vehicleCount').text(vehicles.length);
         $('#vehicleTableBody').empty();
 
         if (vehicles.length === 0) {
-          $('#vehicleTableBody').append(`<tr><td colspan="9" style="text-align:center; color:#6b7280; padding:30px;">No vehicles registered yet.</td></tr>`);
+          $('#vehicleTableBody').append(`<tr><td colspan="9" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
           return;
         }
 
         vehicles.forEach(function (vehicle) {
+          // Check if QR is available; if not, show "Not Available" in a styled span
+          const qrDisplay = vehicle.qrString === "Not Available"
+            ? '<span style="color: #ef4444; font-style: italic;">Not Available</span>'
+            : `<span class="qr-text-string" style="color: #2563eb; font-weight: 600;">${vehicle.qrString}</span>`;
+
           const rowHtml = `
-            <tr>
-              <td class="reg-no-bold">${vehicle.vehicleNo}</td>
-              <td>${vehicle.ownerName}</td>
-              <td>${vehicle.vehicleModel}</td>
-              <td>${vehicle.nic}</td>
-              <td>${vehicle.fuelType}</td>
-              <td>${vehicle.station}</td>
-              <td>${vehicle.quota}L</td>
-              <td class="qr-text-string">${vehicle.qrString}</td>
-              <td><span class="status-badge">Active</span></td>
-            </tr>
-          `;
+                <tr>
+                    <td class="reg-no-bold">${vehicle.vehicleNo}</td>
+                    <td>${vehicle.ownerName}</td>
+                    <td>${vehicle.vehicleModel}</td>
+                    <td>${vehicle.nic}</td>
+                    <td>${vehicle.fuelType}</td>
+                    <td>${vehicle.station}</td>
+                    <td>${vehicle.quota}L</td>
+                    <td>${qrDisplay}</td>
+                    <td><span class="status-badge">Active</span></td>
+                </tr>
+            `;
           $('#vehicleTableBody').append(rowHtml);
         });
       }
 
-      // Handle form submission 
       $('#vehicleRegForm').on('submit', function (e) {
         e.preventDefault();
 
-        // Retrieve form values
-        const vehicleNo = $('#vehicleNo').val().trim();
-        const vehicleModel = $('#vehicleModel').val().trim();
-        const firstName = $('#firstName').val().trim();
-        const lastName = $('#lastName').val().trim();
-        const nic = $('#nic').val().trim();
-        const fuelType = $('#fuelType').val();
-        const station = $('#station').val();
-        const quota = $('#quota').val().trim();
-
-        // Structure the current object data
         const newVehicle = {
-          vehicleNo: vehicleNo,
-          ownerName: firstName + ' ' + lastName,
-          vehicleModel: vehicleModel,
-          nic: nic,
-          fuelType: fuelType,
-          station: station,
-          quota: quota,
-          qrString: generateMockQRString()
+          vehicleNo: $('#vehicleNo').val().trim(),
+          ownerName: $('#firstName').val().trim() + ' ' + $('#lastName').val().trim(),
+          vehicleModel: $('#vehicleModel').val().trim(),
+          nic: $('#nic').val().trim(),
+          fuelType: $('#fuelType').val(),
+          station: $('#station').val(),
+          quota: $('#quota').val().trim(),
+          qrString: "Not Available" // Default status for new registrations
         };
 
-        // Fetch array from storage, add new item, save back to local storage
         const vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
         vehicles.push(newVehicle);
         localStorage.setItem('registeredVehicles', JSON.stringify(vehicles));
 
-        // Refresh UI View
         loadVehicles();
-
-        // Reset inputs on the form so the user can easily register another vehicle directly
-        $('#vehicleRegForm')[0].reset();
-
-        // Smoothly scroll down to view the added row entries
-        $('html, body').animate({
-          scrollTop: $("#registeredVehiclesCard").offset().top - 20
-        }, 500);
+        this.reset();
       });
 
-      // Initial Call to show any existing entries on page load
       loadVehicles();
     });
   </script>

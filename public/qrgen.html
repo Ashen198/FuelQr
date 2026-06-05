@@ -257,9 +257,7 @@
 
     <script>
         $(document).ready(function () {
-
             $("#generateBtn").click(function () {
-
                 let vehicleNumber = $("#vehicleNo").val().trim();
 
                 if (vehicleNumber == "") {
@@ -267,17 +265,35 @@
                     return;
                 }
 
-                // Define the structural object that will be hidden inside the QR data
-                let qrPayload = {
-                    vehicleNo: vehicleNumber,
-                    fuelType: "Petrol",
-                    quota: 20
-                };
+                // 1. Fetch current registered vehicles
+                let vehicles = JSON.parse(localStorage.getItem('registeredVehicles')) || [];
 
-                // 1. Clear old QR container and generate visually for the Admin
+                // 2. Find the vehicle index matching the registration number
+                let vehicleIndex = vehicles.findIndex(v => v.vehicleNo.toLowerCase() === vehicleNumber.toLowerCase());
+
+                if (vehicleIndex === -1) {
+                    alert("Vehicle registration number not found in the system!");
+                    return;
+                }
+
+                // 3. Generate the unique QR String
+                let generatedCode = "QR-" + Math.floor(Math.random() * 1000000000) + "-" + vehicleNumber.substring(0, 3);
+
+                // 4. Update the vehicle object in the array
+                vehicles[vehicleIndex].qrString = generatedCode;
+
+                // 5. Save the updated list back to localStorage
+                localStorage.setItem('registeredVehicles', JSON.stringify(vehicles));
+
+                // 6. Visual QR Generation
                 $("#qrcode").html("");
                 new QRCode(document.getElementById("qrcode"), {
-                    text: JSON.stringify(qrPayload),
+                    text: JSON.stringify({
+                        vehicleNo: vehicles[vehicleIndex].vehicleNo,
+                        fuelType: vehicles[vehicleIndex].fuelType,
+                        quota: vehicles[vehicleIndex].quota,
+                        code: generatedCode
+                    }),
                     width: 250,
                     height: 250,
                     colorDark: "#000000",
@@ -285,26 +301,8 @@
                     correctLevel: QRCode.CorrectLevel.H
                 });
 
-                // 2. Send the data to your Node server to replace "Not Available" for the user
-                $.ajax({
-                    url: "/api/save-qr",
-                    type: "POST",
-                    contentType: "application/json",
-                    data: JSON.stringify({
-                        vehicleNo: vehicleNumber,
-                        qrString: JSON.stringify(qrPayload) // Storing the exact string structure
-                    }),
-                    success: function (response) {
-                        alert("QR Code assigned to vehicle " + vehicleNumber + " successfully!");
-                    },
-                    error: function (xhr, status, error) {
-                        console.error("Failed to save QR to server file system:", error);
-                        alert("Error saving QR code data.");
-                    }
-                });
-
+                alert("QR Code generated and assigned to " + vehicleNumber);
             });
-
         });
     </script>
 
