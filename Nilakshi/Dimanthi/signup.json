@@ -20,6 +20,12 @@
       "email": "ranu@gmail.com",
       "password": "123",
       "createdAt": "2026-06-05T07:45:57.336Z"
+    },
+    {
+      "fullname": "Ashen Herath",
+      "email": "ashen@gmail.com",
+      "password": "1234",
+      "createdAt": "2026-06-05T15:11:28.773Z"
     }
   ]
 }

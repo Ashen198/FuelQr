@@ -44,6 +44,24 @@ const JSON_PATH = path.join(__dirname, 'Nilakshi', 'Dimanthi', 'signup.json');
 
 async function migrateUsers() {
   try {
+     // 1. Always ensure the default admin exists
+     const adminExists = await User.findOne({ email: 'admin@fuel.com' });
+     if (!adminExists) {
+         const admin = new User({
+             fullname: 'System Admin',
+             email: 'admin@fuel.com',
+             password: '123',
+             role: 'admin'
+         });
+         await admin.save();
+         console.log(">>> Default admin user created (admin@fuel.com / 123)");
+     } else if (adminExists.role !== 'admin') {
+         adminExists.role = 'admin';
+         await adminExists.save();
+         console.log(">>> Admin role restored for admin@fuel.com");
+     }
+
+    // 2. Migrate from signup.json
     if (fs.existsSync(JSON_PATH)) {
       const data = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
       if (data.users && Array.isArray(data.users)) {
