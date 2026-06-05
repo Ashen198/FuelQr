@@ -256,43 +256,56 @@
     </div>
 
     <script>
-
         $(document).ready(function () {
 
             $("#generateBtn").click(function () {
 
-                let vehicleNumber = $("#vehicleNo").val();
+                let vehicleNumber = $("#vehicleNo").val().trim();
 
                 if (vehicleNumber == "") {
                     alert("Please enter vehicle number");
                     return;
                 }
 
-                // Clear old QR
+                // Define the structural object that will be hidden inside the QR data
+                let qrPayload = {
+                    vehicleNo: vehicleNumber,
+                    fuelType: "Petrol",
+                    quota: 20
+                };
+
+                // 1. Clear old QR container and generate visually for the Admin
                 $("#qrcode").html("");
-
-                // Generate QR
                 new QRCode(document.getElementById("qrcode"), {
-
-                    text: JSON.stringify({
-                        vehicleNo: vehicleNumber,
-                        fuelType: "Petrol",
-                        quota: 20
-                    }),
-
+                    text: JSON.stringify(qrPayload),
                     width: 250,
                     height: 250,
-
                     colorDark: "#000000",
                     colorLight: "#ffffff",
-
                     correctLevel: QRCode.CorrectLevel.H
+                });
+
+                // 2. Send the data to your Node server to replace "Not Available" for the user
+                $.ajax({
+                    url: "/api/save-qr",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify({
+                        vehicleNo: vehicleNumber,
+                        qrString: JSON.stringify(qrPayload) // Storing the exact string structure
+                    }),
+                    success: function (response) {
+                        alert("QR Code assigned to vehicle " + vehicleNumber + " successfully!");
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Failed to save QR to server file system:", error);
+                        alert("Error saving QR code data.");
+                    }
                 });
 
             });
 
         });
-
     </script>
 
 </body>
