@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fuel Stations Management</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+    }
+
+    body {
+      background: #f3f5f7;
+      color: #000;
+    }
+
+
+    .top-header {
+      background: #fff;
+      padding: 25px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .top-header h1 {
+      font-size: 20px;
+      font-weight: 600;
+    }
+
+    .logout {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+
+    .navbar {
+      background: #fff;
+      padding: 20px 40px;
+      display: flex;
+
+      gap: 40px;
+      justify-content: flex-start;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #000;
+      text-decoration: none;
+      transition: color 0.2s ease-in-out;
+    }
+
+
+
+
+    .nav-item.active {
+      color: #2563eb;
+    }
+
+    .container {
+      padding: 50px 40px;
+    }
+
+    .welcome-title {
+      font-size: 50px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #6b7280;
+      font-size: 20px;
+      margin-bottom: 40px;
+    }
+
+
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .card-title {
+      font-size: 40px;
+      font-weight: 600;
+      margin-bottom: 10px;
+    }
+
+    .card-subtitle {
+      color: #6b7280;
+      margin-bottom: 40px;
+      font-size: 18px;
+    }
+
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px 80px;
+    }
+
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 15px;
+      font-size: 18px;
+    }
+
+    .form-group input,
+    .form-group select {
+      width: 100%;
+      padding: 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 10px;
+      font-size: 17px;
+      outline: none;
+      background: #fff;
+    }
+
+    .form-group input:focus,
+    .form-group select:focus {
+      border-color: #2563eb;
+    }
+
+
+    .btn {
+      margin-top: 40px;
+      padding: 16px 35px;
+      background: #111827;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 18px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .btn:hover {
+      background: #000;
+    }
+
+
+    @media(max-width:900px) {
+
+      .navbar {
+        flex-wrap: wrap;
+        gap: 20px;
+      }
+
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .welcome-title {
+        font-size: 38px;
+      }
+
+      .card-title {
+        font-size: 30px;
+      }
+
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="top-header">
+    <h1>Fuel QR Registration System</h1>
+
+    <div class="logout">
+      <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      Logout
+    </div>
+  </div>
+
+
+  <div class="navbar">
+
+    <a href="home.html" class="nav-item">
+      <i class="fa-solid fa-house"></i>
+      Home
+    </a>
+
+    <a href="station.html" class="nav-item active">
+      <i class="fa-solid fa-location-dot"></i>
+      Station
+    </a>
+
+    <a href="fuel-type.html" class="nav-item">
+      <i class="fa-regular fa-file"></i>
+      Fuel Type
+    </a>
+
+    <a href="owner-nic.html" class="nav-item">
+      <i class="fa-regular fa-credit-card"></i>
+      Owner NIC
+    </a>
+
+    <a href="vehicle.html" class="nav-item">
+      <i class="fa-solid fa-car"></i>
+      Vehicle
+    </a>
+
+    <a href="qr-code.html" class="nav-item">
+      <i class="fa-solid fa-qrcode"></i>
+      QR Code
+    </a>
+
+    <a href="quota.html" class="nav-item">
+      <i class="fa-solid fa-gauge"></i>
+      Quota
+    </a>
+
+  </div>
+
+
+  <div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h1 class="fw-bold">Fuel Stations</h1>
+        <p class="text-muted">Manage all fuel stations in the system</p>
+      </div>
+      <button class="btn btn-dark" data-bs-toggle="modal" data-bs-target="#stationModal" id="addStationBtn">
+        <i class="fa fa-plus me-2"></i> Add Station
+      </button>
+    </div>
+
+    <div class="card shadow-sm border-0">
+      <div class="card-body">
+        <h5 class="card-title mb-4">
+          <i class="fa fa-location-dot me-2 text-primary"></i> All Stations (<span id="stationCount">0</span>)
+        </h5>
+        <p class="text-muted small mb-4">View and manage fuel stations</p>
+
+        <div class="table-responsive">
+          <table class="table align-middle">
+            <thead class="table-light">
+              <tr>
+                <th>Station Name</th>
+                <th>Operating Hours</th>
+                <th>Contact</th>
+                <th>Available Facilities</th>
+                <th class="text-end">Actions</th>
+              </tr>
+            </thead>
+            <tbody id="stationTableBody">
+
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="modal fade" id="stationModal" tabindex="-1" aria-labelledby="stationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="stationModalLabel">Add Station</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <form id="stationForm">
+            <input type="hidden" id="stationId">
+            <div class="mb-3">
+              <label for="name" class="form-label">Station Name</label>
+              <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="mb-3">
+              <label for="operatingHours" class="form-label">Operating Hours</label>
+              <input type="text" class="form-control" id="operatingHours" placeholder=" 24/7" required>
+            </div>
+            <div class="mb-3">
+              <label for="contact" class="form-label">Contact</label>
+              <input type="text" class="form-control" id="contact" placeholder="" required>
+            </div>
+            <div class="mb-3">
+              <label for="facilities" class="form-label">Available Facilities</label>
+              <input type="text" class="form-control" id="facilities" placeholder="Petrol, Diesel, etc." required>
+            </div>
+            <div class="text-end">
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+              <button type="submit" class="btn btn-primary">Save Station</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="app.js"></script>
+</body>
+
+</html>
