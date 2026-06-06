@@ -1,7 +1,7 @@
 $(document).ready(function () {
     console.log('App JS loaded and ready.');
 
-    const apiUrl = 'http://localhost:3000/api/stations';
+    const apiUrl = '/api/stations';
 
 
     loadStations();
