@@ -12,6 +12,112 @@ const app = express();
 // Middleware
 app.use(express.json());
 
+
+// vehicle Model page process
+
+const MONGO_URI = 'mongodb://localhost:27017/fuelQrDB'; 
+
+mongoose.connect(MONGO_URI)
+    .then(() => console.log('Connected to MongoDB successfully!'))
+    .catch(err => console.error('MongoDB connection error:', err));
+
+// 2. Define Mongoose Schema and Model
+const VehicleModelSchema = new mongoose.Schema({
+    modelName: { type: String, required: true },
+    quota: { type: Number, required: true }
+}, { 
+    timestamps: true,
+    // Automatically transforms MongoDB's default _id to id in JSON outputs to match your frontend code
+    toJSON: {
+        transform: (doc, ret) => {
+            ret.id = ret._id.toString();
+            delete ret._id;
+            delete ret.__v;
+        }
+    }
+});
+
+const VehicleModel = mongoose.model('VehicleModel', VehicleModelSchema);
+
+
+// 3. POST Endpoint - Create a new vehicle model
+app.post('/api/vehicle-models', async (req, res) => {
+    try {
+        const { modelName, quota } = req.body;
+
+        if (!modelName || !quota) {
+            return res.status(400).json({ status: 'error', message: 'Model name and quota are required' });
+        }
+
+        const newModel = new VehicleModel({ modelName, quota });
+        await newModel.save();
+
+        res.json({ status: 'success', message: 'Vehicle model added successfully', data: newModel });
+    } catch (err) {
+        console.error('Error saving model:', err);
+        res.status(500).json({ status: 'error', message: 'Failed to save model to database' });
+    }
+});
+
+
+// 4. GET Endpoint - Fetch all vehicle models
+app.get('/api/vehicle-models', async (req, res) => {
+    try {
+        const models = await VehicleModel.find().sort({ createdAt: -1 });
+        res.json(models);
+    } catch (err) {
+        console.error('Error fetching models:', err);
+        res.status(500).json({ status: 'error', message: 'Failed to retrieve models' });
+    }
+});
+
+
+// 5. PUT Endpoint - Update an existing vehicle model by ID
+app.put('/api/vehicle-models/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { modelName, quota } = req.body;
+
+        const updatedModel = await VehicleModel.findByIdAndUpdate(
+            id,
+            { modelName, quota },
+            { new: true, runValidators: true }
+        );
+
+        if (!updatedModel) {
+            return res.status(404).json({ status: 'error', message: 'Model not found' });
+        }
+
+        res.json({ status: 'success', message: 'Vehicle model updated successfully', data: updatedModel });
+    } catch (err) {
+        console.error('Error updating model:', err);
+        res.status(500).json({ status: 'error', message: 'Failed to update model' });
+    }
+});
+
+
+// 6. DELETE Endpoint - Delete a vehicle model by ID
+app.delete('/api/vehicle-models/:id', async (req, res) => {
+    try {
+        const { id } = req.params;
+        const deletedModel = await VehicleModel.findByIdAndDelete(id);
+
+        if (!deletedModel) {
+            return res.status(404).json({ status: 'error', message: 'Model not found' });
+        }
+
+        res.json({ status: 'success', message: 'Vehicle model removed successfully' });
+    } catch (err) {
+        console.error('Error deleting model:', err);
+        res.status(500).json({ status: 'error', message: 'Failed to delete model' });
+    }
+});
+
+
+
+
+
+
 //fuelType page process
 
 
