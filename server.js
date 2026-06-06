@@ -12,6 +12,96 @@ const app = express();
 // Middleware
 app.use(express.json());
 
+//fuelType page process
+
+
+
+// 1. Define the Fuel Type Schema and Model
+const FuelTypeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  description: { type: String, default: '' },
+  price: { type: Number, required: true, min: 0 },
+  status: { type: String, enum: ['Active', 'Inactive'], default: 'Active' }
+}, { timestamps: true });
+
+const FuelType = mongoose.model('FuelType', FuelTypeSchema);
+
+
+// 2. GET Endpoint - Fetch all fuel types from MongoDB
+app.get('/api/fueltypes', async (req, res) => {
+  try {
+    const fuelTypes = await FuelType.find().sort({ createdAt: -1 }); // Newest first
+    res.status(200).json(fuelTypes);
+  } catch (error) {
+    console.error("Error fetching fuel types:", error);
+    res.status(500).json({ error: "Failed to retrieve fuel types" });
+  }
+});
+
+
+// 3. POST Endpoint - Create a brand new fuel type record
+app.post('/api/fueltypes', async (req, res) => {
+  try {
+    const { name, description, price, status } = req.body;
+
+    const newFuelType = new FuelType({
+      name,
+      description,
+      price,
+      status
+    });
+
+    await newFuelType.save();
+    res.status(201).json(newFuelType);
+  } catch (error) {
+    console.error("Error creating fuel type:", error);
+    res.status(500).json({ error: "Failed to create fuel type entry" });
+  }
+});
+
+
+// 4. PUT Endpoint - Update an existing fuel type details by ID
+app.put('/api/fueltypes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, description, price, status } = req.body;
+
+    const updatedFuelType = await FuelType.findByIdAndUpdate(
+      id,
+      { name, description, price, status },
+      { new: true, runValidators: true } // Returns the modified document instead of the original
+    );
+
+    if (!updatedFuelType) {
+      return res.status(404).json({ error: "Fuel type document not found" });
+    }
+
+    res.status(200).json(updatedFuelType);
+  } catch (error) {
+    console.error("Error updating fuel type:", error);
+    res.status(500).json({ error: "Failed to modify fuel type details" });
+  }
+});
+
+
+// 5. DELETE Endpoint - Permanently drop a fuel type record by ID
+app.delete('/api/fueltypes/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deletedFuelType = await FuelType.findByIdAndDelete(id);
+
+    if (!deletedFuelType) {
+      return res.status(404).json({ error: "Fuel type document not found" });
+    }
+
+    res.status(200).json({ message: "Fuel type completely removed successfully" });
+  } catch (error) {
+    console.error("Error deleting fuel type:", error);
+    res.status(500).json({ error: "Failed to delete fuel type data entry" });
+  }
+});
+
+
 // --- AUTH ENDPOINTS ---
 
 app.post('/api/signup', async (req, res) => {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -66,15 +67,37 @@
       text-decoration: none;
     }
 
-    .nav-item:hover { color: #4b5563; }
-    .nav-item.active { border-bottom: 2px solid #020617; padding-bottom: 2px; }
+    .nav-item:hover {
+      color: #4b5563;
+    }
 
-    .main { padding: 50px 40px; }
+    .nav-item.active {
+      border-bottom: 2px solid #020617;
+      padding-bottom: 2px;
+    }
 
-    .page-title { font-size: 48px; font-weight: 700; margin-bottom: 5px; }
-    .page-sub { color: #6b7280; font-size: 20px; margin-bottom: 30px; }
+    .main {
+      padding: 50px 40px;
+    }
 
-    .stats-row { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+    .page-title {
+      font-size: 48px;
+      font-weight: 700;
+      margin-bottom: 5px;
+    }
+
+    .page-sub {
+      color: #6b7280;
+      font-size: 20px;
+      margin-bottom: 30px;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 30px;
+      flex-wrap: wrap;
+    }
 
     .stat-card {
       background: #fff;
@@ -85,8 +108,16 @@
       min-width: 140px;
     }
 
-    .stat-label { font-size: 14px; color: #6b7280; margin-bottom: 6px; }
-    .stat-value { font-size: 32px; font-weight: 700; }
+    .stat-label {
+      font-size: 14px;
+      color: #6b7280;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 32px;
+      font-weight: 700;
+    }
 
     .card-custom {
       background: #fff;
@@ -95,8 +126,17 @@
       border: 1px solid #e5e7eb;
     }
 
-    .card-title { font-size: 36px; font-weight: 700; margin-bottom: 8px; }
-    .card-sub { color: #6b7280; font-size: 17px; margin-bottom: 25px; }
+    .card-title {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .card-sub {
+      color: #6b7280;
+      font-size: 17px;
+      margin-bottom: 25px;
+    }
 
     .action-bar {
       display: flex;
@@ -107,7 +147,10 @@
       gap: 12px;
     }
 
-    .search-wrap { position: relative; width: 280px; }
+    .search-wrap {
+      position: relative;
+      width: 280px;
+    }
 
     .search-wrap i {
       position: absolute;
@@ -127,7 +170,9 @@
       outline: none;
     }
 
-    .search-input:focus { border-color: #020617; }
+    .search-input:focus {
+      border-color: #020617;
+    }
 
     .btn-add {
       background: #020617;
@@ -144,10 +189,19 @@
       gap: 8px;
     }
 
-    .btn-add:hover { opacity: .85; }
+    .btn-add:hover {
+      opacity: .85;
+    }
 
-    table { width: 100%; border-collapse: collapse; min-width: 650px; }
-    thead { border-bottom: 1px solid #e5e7eb; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 650px;
+    }
+
+    thead {
+      border-bottom: 1px solid #e5e7eb;
+    }
 
     th {
       text-align: left;
@@ -163,7 +217,9 @@
       border-bottom: 1px solid #f3f5f7;
     }
 
-    tbody tr:last-child td { border-bottom: none; }
+    tbody tr:last-child td {
+      border-bottom: none;
+    }
 
     .badge-status {
       background: #020617;
@@ -175,7 +231,9 @@
       display: inline-block;
     }
 
-    .badge-status.off { background: #9ca3af; }
+    .badge-status.off {
+      background: #9ca3af;
+    }
 
     .btn-icon {
       background: none;
@@ -187,11 +245,28 @@
       margin-right: 3px;
     }
 
-    .btn-icon:hover { background: #f3f5f7; }
-    .btn-icon.del:hover { background: #fef2f2; border-color: #fca5a5; color: #dc2626; }
+    .btn-icon:hover {
+      background: #f3f5f7;
+    }
 
-    .empty { text-align: center; padding: 50px; color: #9ca3af; display: none; }
-    .empty i { font-size: 42px; margin-bottom: 12px; display: block; }
+    .btn-icon.del:hover {
+      background: #fef2f2;
+      border-color: #fca5a5;
+      color: #dc2626;
+    }
+
+    .empty {
+      text-align: center;
+      padding: 50px;
+      color: #9ca3af;
+      display: none;
+    }
+
+    .empty i {
+      font-size: 42px;
+      margin-bottom: 12px;
+      display: block;
+    }
 
     .toast-wrap {
       position: fixed;
@@ -215,26 +290,54 @@
       animation: slideUp .3s ease;
     }
 
-    .toast-msg.ok  { background: #16a34a; }
-    .toast-msg.err { background: #dc2626; }
-
-    @keyframes slideUp {
-      from { transform: translateY(16px); opacity: 0; }
-      to   { transform: translateY(0);    opacity: 1; }
+    .toast-msg.ok {
+      background: #16a34a;
     }
 
-    .modal-content { border-radius: 18px; border: 1px solid #e5e7eb; }
-    .modal-title   { font-size: 20px; font-weight: 700; }
-    .form-label    { font-weight: 500; font-size: 14px; }
+    .toast-msg.err {
+      background: #dc2626;
+    }
 
-    .form-control, .form-select {
+    @keyframes slideUp {
+      from {
+        transform: translateY(16px);
+        opacity: 0;
+      }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
+      }
+    }
+
+    .modal-content {
+      border-radius: 18px;
+      border: 1px solid #e5e7eb;
+    }
+
+    .modal-title {
+      font-size: 20px;
+      font-weight: 700;
+    }
+
+    .form-label {
+      font-weight: 500;
+      font-size: 14px;
+    }
+
+    .form-control,
+    .form-select {
       border: 1px solid #e5e7eb;
       border-radius: 10px;
       font-family: 'Poppins', sans-serif;
       font-size: 14px;
     }
 
-    .form-control:focus, .form-select:focus { border-color: #020617; box-shadow: none; }
+    .form-control:focus,
+    .form-select:focus {
+      border-color: #020617;
+      box-shadow: none;
+    }
 
     .btn-save {
       background: #020617;
@@ -248,8 +351,13 @@
       cursor: pointer;
     }
 
-    .btn-save:hover { opacity: .85; }
-    .btn-save.red   { background: #dc2626; }
+    .btn-save:hover {
+      opacity: .85;
+    }
+
+    .btn-save.red {
+      background: #dc2626;
+    }
 
     .btn-cancel {
       background: #f3f5f7;
@@ -263,14 +371,29 @@
     }
 
     @media(max-width: 900px) {
-      .page-title    { font-size: 34px; }
-      .card-title    { font-size: 26px; }
-      .navbar-custom { gap: 18px; }
-      .main          { padding: 28px 18px; }
-      .top-header    { padding: 18px 20px; }
+      .page-title {
+        font-size: 34px;
+      }
+
+      .card-title {
+        font-size: 26px;
+      }
+
+      .navbar-custom {
+        gap: 18px;
+      }
+
+      .main {
+        padding: 28px 18px;
+      }
+
+      .top-header {
+        padding: 18px 20px;
+      }
     }
   </style>
 </head>
+
 <body>
 
   <div class="top-header">
@@ -411,9 +534,9 @@
     const API = 'http://localhost:3000/api/fueltypes';
     let data = [], editId = null, delId = null;
     const mFuel = new bootstrap.Modal('#fuelModal');
-    const mDel  = new bootstrap.Modal('#delModal');
+    const mDel = new bootstrap.Modal('#delModal');
 
-    
+
     $(document).ready(function () {
       $.ajax({
         url: API,
@@ -425,9 +548,9 @@
         },
         error: function () {
           data = [
-            { _id: '1', name: 'Petrol',   description: 'Unleaded petrol',    price: 317, status: 'Active'   },
-            { _id: '2', name: 'Diesel',   description: 'High-grade diesel',   price: 340, status: 'Active'   },
-            { _id: '3', name: 'Electric', description: 'EV charging service', price: 0,   status: 'Inactive' },
+            { _id: '1', name: 'Petrol', description: 'Unleaded petrol', price: 317, status: 'Active' },
+            { _id: '2', name: 'Diesel', description: 'High-grade diesel', price: 340, status: 'Active' },
+            { _id: '3', name: 'Electric', description: 'EV charging service', price: 0, status: 'Inactive' },
           ];
           render();
           toast('Demo data loaded (API offline)', 'err');
@@ -435,7 +558,7 @@
       });
     });
 
-    
+
     $('#searchInput').on('keyup', function () {
       const q = $(this).val().toLowerCase();
       $('#tbody tr').each(function () {
@@ -446,7 +569,7 @@
       );
     });
 
-    
+
     function openAdd() {
       editId = null;
       document.getElementById('modalTitle').textContent = 'Add Fuel Type';
@@ -457,7 +580,7 @@
       mFuel.show();
     }
 
-    
+
     function openEdit(id) {
       const f = data.find(x => x._id == id);
       if (!f) return;
@@ -470,11 +593,11 @@
       mFuel.show();
     }
 
-  
+
     function saveFuelType() {
-      const name  = document.getElementById('fName').value.trim();
+      const name = document.getElementById('fName').value.trim();
       const price = document.getElementById('fPrice').value;
-      if (!name)                                   return toast('Name is required.', 'err');
+      if (!name) return toast('Name is required.', 'err');
       if (price === '' || isNaN(price) || +price < 0) return toast('Enter a valid price.', 'err');
 
       const payload = {
@@ -505,7 +628,7 @@
       });
     }
 
-    
+
     function openDel(id, name) {
       delId = id;
       document.getElementById('delName').textContent = name;
@@ -518,12 +641,12 @@
         url: `${API}/${delId}`,
         type: 'DELETE',
         success: function () {
-          data = data.filter(f => f._id != delId); 
+          data = data.filter(f => f._id != delId);
           done('Deleted!', true);
         },
         error: function () {
-          data = data.filter(f => f._id != delId); 
-          done('Deleted (demo)!', true); 
+          data = data.filter(f => f._id != delId);
+          done('Deleted (demo)!', true);
         }
       });
     }
@@ -546,7 +669,7 @@
             </td>
           </tr>`;
       });
-      
+
       document.getElementById('empty').style.display = data.length === 0 ? 'block' : 'none';
       document.getElementById('cardTitle').textContent = `⛽ Fuel Types (${data.length})`;
       document.getElementById('sTotal').textContent = data.length;
@@ -575,4 +698,5 @@
     }
   </script>
 </body>
+
 </html>
