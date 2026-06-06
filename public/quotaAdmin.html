@@ -1,171 +1,175 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fuel QR Registration System</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
   <style>
-    *{
-      margin:0;
-      padding:0;
-      box-sizing:border-box;
-      font-family:'Poppins',sans-serif;
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
     }
 
-    body{
-      background:#f3f5f7;
-      color:#000;
+    body {
+      background: #f3f5f7;
+      color: #000;
     }
 
     /* HEADER */
-    .top-header{
-      background:#fff;
-      padding:25px 40px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      border-bottom:1px solid #ddd;
+    .top-header {
+      background: #fff;
+      padding: 25px 40px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #ddd;
     }
 
-    .top-header h1{
-      font-size:20px;
-      font-weight:600;
+    .top-header h1 {
+      font-size: 20px;
+      font-weight: 600;
     }
 
-    .logout{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-      font-weight:500;
+    .logout {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
     }
 
     /* NAVBAR */
-    .navbar{
-      background:#fff;
-      padding:20px 40px;
-      display:flex;
-      gap:40px;
-      border-bottom:1px solid #ddd;
-      flex-wrap:wrap;
+    .navbar {
+      background: #fff;
+      padding: 20px 40px;
+      display: flex;
+      gap: 40px;
+      border-bottom: 1px solid #ddd;
+      flex-wrap: wrap;
     }
 
-    .nav-item{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      cursor:pointer;
-      font-weight:500;
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #000;
+      text-decoration: none;
     }
+
 
     /* MAIN CONTAINER */
-    .container{
-      padding:50px 40px;
+    .container {
+      padding: 50px 40px;
     }
 
     /* CARD styling restored */
-    .card{
-      background:#fff;
-      border-radius:20px;
-      padding:35px;
-      border:1px solid #e5e7eb;
-      overflow-x:auto;
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      padding: 35px;
+      border: 1px solid #e5e7eb;
+      overflow-x: auto;
       margin-bottom: 40px;
     }
 
-    .table-title{
-      font-size:36px;
-      font-weight:700;
-      margin-bottom:5px;
+    .table-title {
+      font-size: 36px;
+      font-weight: 700;
+      margin-bottom: 5px;
     }
 
-    .table-subtitle{
-      color:#6b7280;
-      font-size:17px;
-      margin-bottom:35px;
+    .table-subtitle {
+      color: #6b7280;
+      font-size: 17px;
+      margin-bottom: 35px;
     }
 
     /* TABLE styling restored */
-    table{
-      width:100%;
-      border-collapse:collapse;
-      min-width:1000px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 1000px;
     }
 
-    thead{
-      border-bottom:1px solid #e5e7eb;
+    thead {
+      border-bottom: 1px solid #e5e7eb;
     }
 
-    th{
-      text-align:left;
-      padding:18px 20px;
-      color:#6b7280;
-      font-size:15px;
-      font-weight:600;
+    th {
+      text-align: left;
+      padding: 18px 20px;
+      color: #6b7280;
+      font-size: 15px;
+      font-weight: 600;
     }
 
-    td{
-      padding:25px 20px;
-      font-size:16px;
+    td {
+      padding: 25px 20px;
+      font-size: 16px;
     }
 
-    .qr-text{
-      font-size:14px;
+    .qr-text {
+      font-size: 14px;
     }
 
-    .status{
-      background:#020617;
-      color:#fff;
-      padding:6px 16px;
-      border-radius:20px;
-      font-size:14px;
-      font-weight:500;
-      display:inline-block;
+    .status {
+      background: #020617;
+      color: #fff;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 500;
+      display: inline-block;
     }
 
     /* Form styling matching the design language */
     .form-group-container {
-      display: flex; 
-      flex-wrap: wrap; 
-      gap: 20px; 
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
       align-items: flex-end;
     }
 
     .form-field {
-      flex: 1; 
+      flex: 1;
       min-width: 200px;
     }
 
     .form-field label {
-      display: block; 
-      margin-bottom: 8px; 
-      font-weight: 500; 
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
       font-size: 14px;
     }
 
     .form-field input {
-      width: 100%; 
-      padding: 12px; 
-      border: 1px solid #ddd; 
-      border-radius: 8px; 
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
       font-size: 15px;
     }
 
     .submit-btn {
-      background: #020617; 
-      color: #fff; 
-      padding: 12px 30px; 
-      border: none; 
-      border-radius: 8px; 
-      font-weight: 500; 
-      cursor: pointer; 
-      font-size: 15px; 
+      background: #020617;
+      color: #fff;
+      padding: 12px 30px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 500;
+      cursor: pointer;
+      font-size: 15px;
       height: 48px;
       transition: background 0.2s ease;
     }
@@ -174,16 +178,18 @@
       background: #1e293b;
     }
 
-    @media(max-width:900px){
-      .table-title{
-        font-size:28px;
+    @media(max-width:900px) {
+      .table-title {
+        font-size: 28px;
       }
-      .navbar{
-        gap:20px;
+
+      .navbar {
+        gap: 20px;
       }
     }
   </style>
 </head>
+
 <body>
 
   <div class="top-header">
@@ -194,14 +200,27 @@
     </div>
   </div>
 
+
   <div class="navbar">
-    <div class="nav-item"><i class="fa-solid fa-house"></i> Home</div>
-    <div class="nav-item"><i class="fa-solid fa-location-dot"></i> Station</div>
-    <div class="nav-item"><i class="fa-regular fa-file"></i> Fuel Type</div>
-    <div class="nav-item"><i class="fa-regular fa-credit-card"></i> Owner NIC</div>
-    <div class="nav-item"><i class="fa-solid fa-car"></i> Vehicle</div>
-    <div class="nav-item"><i class="fa-solid fa-qrcode"></i> QR Code</div>
-    <div class="nav-item"><i class="fa-solid fa-gauge"></i> Quota</div>
+    <a href="admin.html" class="nav-item">
+      <i class="fa-solid fa-house"></i> Home
+    </a>
+    <a href="../station.html" class="nav-item">
+      <i class="fa-solid fa-location-dot"></i> Station
+    </a>
+    <a href="../fuelType.html" class="nav-item">
+      <i class="fa-solid fa-file"></i> Fuel Type
+    </a>
+    <a href="../vehicle.html" class="nav-item">
+      <i class="fa-solid fa-car"></i> Vehicle
+    </a>
+    <a href="../qrgen.html" class="nav-item">
+      <i class="fa-solid fa-qrcode"></i> QR Code
+    </a>
+    <a href="../quotaAdmin.html" class="nav-item">
+      <i class="fa-solid fa-gauge"></i> Quota
+    </a>
+
   </div>
 
   <div class="container">
@@ -209,7 +228,7 @@
     <div class="card">
       <h2 class="table-title">Add a new Quota</h2>
       <p class="table-subtitle">Configure system-wide fuel limits for registered vehicles.</p>
-      
+
       <form id="quotaForm" class="form-group-container">
         <div class="form-field">
           <label for="vehicleType">Vehicle Type</label>
@@ -226,7 +245,7 @@
     <div class="card">
       <h2 class="table-title">Recently Added Quotas</h2>
       <p class="table-subtitle">Live status tracking of fuel allowance allocations.</p>
-      
+
       <table>
         <thead>
           <tr>
@@ -237,7 +256,7 @@
           </tr>
         </thead>
         <tbody id="quotaTableBody">
-          </tbody>
+        </tbody>
       </table>
     </div>
 
@@ -253,10 +272,10 @@
         try {
           const response = await fetch('/api/quotas');
           const quotas = await response.json();
-          
+
           quotaTableBody.innerHTML = ''; // Wipe old row data safely
 
-          if(!quotas || quotas.length === 0) {
+          if (!quotas || quotas.length === 0) {
             quotaTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 30px;">No quotas found in the system.</td></tr>`;
             return;
           }
@@ -265,7 +284,7 @@
           quotas.forEach(quota => {
             const row = document.createElement('tr');
             row.style.borderBottom = "1px solid #e5e7eb";
-            
+
             // Extracts last 6 characters of MongoDB ObjectId for clean tracking numbers
             const shortId = quota._id ? quota._id.substring(18) : 'N/A';
 
@@ -302,6 +321,7 @@
           });
 
           if (response.ok) {
+            alert('Quota saved successfully!');
             quotaForm.reset(); // Clear text inputs
             await loadQuotas(); // Immediately rebuild table rows via AJAX without reloading
           } else {
@@ -319,4 +339,5 @@
     });
   </script>
 </body>
+
 </html>

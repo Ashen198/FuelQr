@@ -104,7 +104,7 @@
         </div>
     </div>
 
-    <div class="custom-navbar">
+    <!-- <div class="custom-navbar">
         <a href="../admin.html" class="custom-nav-item">
             <i class="fa-solid fa-house"></i> Home
         </a>
@@ -117,6 +117,29 @@
         <a href="quotaAdmin.html" class="custom-nav-item">
             <i class="fa-solid fa-gauge"></i> Quota
         </a>
+    </div> -->
+
+
+    <div class="custom-navbar">
+        <a href="admin.html" class="custom-nav-item ">
+            <i class="fa-solid fa-house"></i> Home
+        </a>
+        <a href="../station.html" class="custom-nav-item">
+            <i class="fa-solid fa-location-dot"></i> Station
+        </a>
+        <a href="../fuelType.html" class="custom-nav-item">
+            <i class="fa-solid fa-file"></i> Fuel Type
+        </a>
+        <a href="../vehicle.html" class="custom-nav-item">
+            <i class="fa-solid fa-car"></i> Vehicle
+        </a>
+        <a href="../qrgen.html" class="custom-nav-item">
+            <i class="fa-solid fa-qrcode"></i> QR Code
+        </a>
+        <a href="../quotaAdmin.html" class="custom-nav-item">
+            <i class="fa-solid fa-gauge"></i> Quota
+        </a>
+
     </div>
 
     <div class="box">
@@ -136,7 +159,7 @@
 
     <script>
         $(document).ready(function () {
-            $('#logoutBtn').on('click', function() {
+            $('#logoutBtn').on('click', function () {
                 localStorage.removeItem('currentUser');
                 window.location.href = '/';
             });
@@ -155,7 +178,7 @@
                     method: 'GET',
                     success: function (vehicles) {
                         const vehicle = vehicles.find(v => v.vehicleNo.toLowerCase().replace(/\s/g, '') === vehicleNumber.toLowerCase().replace(/\s/g, ''));
-                        
+
                         if (!vehicle) {
                             alert("Error: Vehicle '" + vehicleNumber + "' not found in system.");
                             return;
@@ -170,7 +193,7 @@
                             method: 'PATCH',
                             contentType: 'application/json',
                             data: JSON.stringify({ qrString: generatedCode }),
-                            success: function(updatedVehicle) {
+                            success: function (updatedVehicle) {
                                 // 4. Draw QR Code
                                 $("#qrcode").html("");
                                 new QRCode(document.getElementById("qrcode"), {
@@ -189,12 +212,12 @@
 
                                 alert("Success! QR Code generated and assigned to " + updatedVehicle.vehicleNo);
                             },
-                            error: function() {
+                            error: function () {
                                 alert("Failed to update QR string on server.");
                             }
                         });
                     },
-                    error: function() {
+                    error: function () {
                         alert("Failed to connect to server.");
                     }
                 });

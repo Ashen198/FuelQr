@@ -28,11 +28,11 @@ app.get('/', (req, res) => {
 // MongoDB Connection with timeout handling
 console.log(">>> Connecting to MongoDB...");
 mongoose.connect('mongodb://localhost:27017/fuelQrDB', {
-    serverSelectionTimeoutMS: 5000 // Fail fast if MongoDB is not running
+  serverSelectionTimeoutMS: 5000 // Fail fast if MongoDB is not running
 })
   .then(() => {
     console.log('>>> Connected securely to MongoDB.');
-    migrateUsers(); 
+    migrateUsers();
   })
   .catch(err => {
     console.error('>>> DATABASE CONNECTION ERROR:', err.message);
@@ -44,22 +44,22 @@ const JSON_PATH = path.join(__dirname, 'Nilakshi', 'Dimanthi', 'signup.json');
 
 async function migrateUsers() {
   try {
-     // 1. Always ensure the default admin exists
-     const adminExists = await User.findOne({ email: 'admin@fuel.com' });
-     if (!adminExists) {
-         const admin = new User({
-             fullname: 'System Admin',
-             email: 'admin@fuel.com',
-             password: '123',
-             role: 'admin'
-         });
-         await admin.save();
-         console.log(">>> Default admin user created (admin@fuel.com / 123)");
-     } else if (adminExists.role !== 'admin') {
-         adminExists.role = 'admin';
-         await adminExists.save();
-         console.log(">>> Admin role restored for admin@fuel.com");
-     }
+    // 1. Always ensure the default admin exists
+    const adminExists = await User.findOne({ email: 'admin@fuel.com' });
+    if (!adminExists) {
+      const admin = new User({
+        fullname: 'System Admin',
+        email: 'admin@fuel.com',
+        password: '123',
+        role: 'admin'
+      });
+      await admin.save();
+      console.log(">>> Default admin user created (admin@fuel.com / 123)");
+    } else if (adminExists.role !== 'admin') {
+      adminExists.role = 'admin';
+      await adminExists.save();
+      console.log(">>> Admin role restored for admin@fuel.com");
+    }
 
     // 2. Migrate from signup.json
     if (fs.existsSync(JSON_PATH)) {
@@ -88,21 +88,21 @@ async function migrateUsers() {
 }
 
 function updateJson(newUser) {
-    try {
-        let data = { users: [] };
-        if (fs.existsSync(JSON_PATH)) {
-            data = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
-        }
-        data.users.push({
-            fullname: newUser.fullname,
-            email: newUser.email,
-            password: newUser.password,
-            createdAt: new Date().toISOString()
-        });
-        fs.writeFileSync(JSON_PATH, JSON.stringify(data, null, 2));
-    } catch (err) {
-        console.error('>>> Error updating JSON:', err.message);
+  try {
+    let data = { users: [] };
+    if (fs.existsSync(JSON_PATH)) {
+      data = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
     }
+    data.users.push({
+      fullname: newUser.fullname,
+      email: newUser.email,
+      password: newUser.password,
+      createdAt: new Date().toISOString()
+    });
+    fs.writeFileSync(JSON_PATH, JSON.stringify(data, null, 2));
+  } catch (err) {
+    console.error('>>> Error updating JSON:', err.message);
+  }
 }
 
 // --- AUTH ENDPOINTS ---
@@ -116,7 +116,7 @@ app.post('/api/signup', async (req, res) => {
     const role = email === 'admin@fuel.com' ? 'admin' : 'user';
     const newUser = new User({ fullname, email, password, role });
     await newUser.save();
-    
+
     updateJson({ fullname, email, password });
 
     res.status(201).json({ message: 'User created successfully' });
@@ -135,9 +135,9 @@ app.post('/api/login', async (req, res) => {
       return res.status(400).json({ message: 'Invalid email or password' });
     }
 
-    res.status(200).json({ 
-      message: 'Login successful', 
-      user: { fullname: user.fullname, email: user.email, role: user.role } 
+    res.status(200).json({
+      message: 'Login successful',
+      user: { fullname: user.fullname, email: user.email, role: user.role }
     });
   } catch (error) {
     res.status(500).json({ message: 'Login error', error: error.message });
@@ -172,18 +172,18 @@ app.post('/api/vehicles', async (req, res) => {
 });
 
 app.patch('/api/vehicles/:vehicleNo/qr', async (req, res) => {
-    try {
-        const { qrString } = req.body;
-        const vehicle = await Vehicle.findOneAndUpdate(
-            { vehicleNo: req.params.vehicleNo },
-            { qrString },
-            { new: true }
-        );
-        if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
-        res.status(200).json(vehicle);
-    } catch (error) {
-        res.status(500).json({ error: 'Failed to update QR' });
-    }
+  try {
+    const { qrString } = req.body;
+    const vehicle = await Vehicle.findOneAndUpdate(
+      { vehicleNo: req.params.vehicleNo },
+      { qrString },
+      { new: true }
+    );
+    if (!vehicle) return res.status(404).json({ message: 'Vehicle not found' });
+    res.status(200).json(vehicle);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to update QR' });
+  }
 });
 
 // --- QUOTA ENDPOINTS ---
@@ -196,9 +196,20 @@ app.get('/api/quotas', async (req, res) => {
   }
 });
 
+app.post('/api/quotas', async (req, res) => {
+  try {
+    const { vehicleType, allowedLiters } = req.body;
+    const newQuota = new Quota({ vehicleType, allowedLiters });
+    await newQuota.save();
+    res.status(201).json(newQuota);
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to save quota', details: error.message });
+  }
+});
+
 // Start Server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`>>> Server is running!`);
-    console.log(`>>> Local Access: http://localhost:${PORT}`);
+  console.log(`>>> Server is running!`);
+  console.log(`>>> Local Access: http://localhost:${PORT}`);
 });
