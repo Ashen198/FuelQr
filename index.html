@@ -256,10 +256,12 @@
               <option value="">Select station</option>
             </select>
           </div>
-          <div class="form-group">
-            <label>Weekly Fuel Quota (Liters)</label>
-            <input type="number" id="quota" placeholder="40" required min="1">
-          </div>
+         <div class="form-group">
+           <label>Vehicle Type</label>
+           <select id="vehicleModelSelect" required>
+             <option value="">Select vehicle category</option>
+           </select>
+         </div>
         </div>
         <button type="submit" class="btn">Register Vehicle</button>
       </form>
@@ -293,7 +295,7 @@
     </div>
   </div>
 
-  <script>
+  <!-- <script>
     $(document).ready(function () {
       const user = JSON.parse(localStorage.getItem('currentUser'));
       $('#userName').text(user.fullname);
@@ -413,7 +415,173 @@
       loadVehicles();
       loadStations();
     });
-  </script>
+  </script> -->
+
+<script>
+  $(document).ready(function () {
+    const user = JSON.parse(localStorage.getItem('currentUser'));
+    $('#userName').text(user.fullname);
+    $('#email').val(user.email);
+
+    $('#logoutBtn').on('click', function() {
+      localStorage.removeItem('currentUser');
+      window.location.href = '/';
+    });
+
+    // --- NEW FUNCTION: Fetch categories registered in vehicleModel.html ---
+    function loadVehicleModels() {
+      $.ajax({
+        url: '/api/vehicle-models',
+        method: 'GET',
+        success: function (models) {
+          const modelSelect = $('#vehicleModelSelect');
+          // Wipe out previous entries keeping the placeholder intact
+          modelSelect.find('option:not(:first)').remove();
+          
+          models.forEach(model => {
+            // Store the quota directly inside a data-quota attribute on each option element
+            modelSelect.append(`
+              <option value="${model.modelName}" data-quota="${model.quota}">
+                ${model.modelName} (${model.quota}L)
+              </option>
+            `);
+          });
+        },
+        error: function() {
+          console.error("Failed to load vehicle categories into form selection items.");
+        }
+      });
+    }
+
+    function loadStations() {
+      $.ajax({
+        url: '/api/stations',
+        method: 'GET',
+        success: function (stations) {
+          const stationSelect = $('#station');
+          stationSelect.find('option:not(:first)').remove();
+          stations.forEach(station => {
+            stationSelect.append(`<option value="${station.name}">${station.name}</option>`);
+          });
+        }
+      });
+    }
+
+    function loadVehicles() {
+      $.ajax({
+        url: `/api/vehicles?email=${user.email}&role=${user.role}`,
+        method: 'GET',
+        success: function (vehicles) {
+          $('#vehicleCount').text(vehicles.length);
+          $('#vehicleTableBody').empty();
+
+          if (vehicles.length === 0) {
+            $('#vehicleTableBody').append(`<tr><td colspan="9" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
+            return;
+          }
+
+          vehicles.forEach(function (vehicle, index) {
+            const isNotAvailable = !vehicle.qrString || vehicle.qrString === "Not Available";
+            const qrTargetId = `table-qr-${index}`;
+
+            const qrDisplay = isNotAvailable
+              ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
+              : `<div id="${qrTargetId}" style="display: flex; justify-content: center; align-items: center; min-height: 70px;"></div>`;
+
+            const rowHtml = `
+              <tr>
+                  <td class="reg-no-bold">${vehicle.vehicleNo}</td>
+                  <td>${vehicle.ownerName}</td>
+                  <td>${vehicle.vehicleModel}</td>
+                  <td>${vehicle.nic}</td>
+                  <td>${vehicle.fuelType}</td>
+                  <td>${vehicle.station}</td>
+                  <td>${vehicle.quota}L</td>
+                  <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
+                  <td><span class="status-badge">Active</span></td>
+              </tr>
+            `;
+            $('#vehicleTableBody').append(rowHtml);
+
+            if (!isNotAvailable) {
+              setTimeout(() => {
+                  const targetElement = document.getElementById(qrTargetId);
+                  if (targetElement) {
+                      new QRCode(targetElement, {
+                      text: JSON.stringify({
+                          vehicleNo: vehicle.vehicleNo,
+                          fuelType: vehicle.fuelType,
+                          quota: vehicle.quota,
+                          qrCodeString: vehicle.qrString
+                      }),
+                      width: 70,
+                      height: 70,
+                      colorDark: "#000000",
+                      colorLight: "#ffffff",
+                      correctLevel: QRCode.CorrectLevel.M
+                      });
+                  }
+              }, 100);
+            }
+          });
+        }
+      });
+    }
+
+    // Handle form submissions
+    
+$('#vehicleRegForm').on('submit', function (e) {
+  e.preventDefault();
+
+  // FIX: Added the dot before find() so jQuery can locate the selected option properly
+  const selectedOption = $('#vehicleModelSelect').find('option:selected');
+  const assignedQuota = selectedOption.attr('data-quota');
+
+  // Safety fallback check in case no option or an empty option is picked
+  if (!assignedQuota) {
+    alert('Please select a valid Vehicle Type category.');
+    return;
+  }
+
+  const formData = {
+    vehicleNo: $('#vehicleNo').val().trim(),
+    ownerName: $('#firstName').val().trim() + ' ' + $('#lastName').val().trim(),
+    vehicleModel: $('#vehicleModel').val().trim(), // e.g., "Corolla 2020"
+    nic: $('#nic').val().trim(),
+    ownerEmail: user.email,
+    fuelType: $('#fuelType').val(),
+    station: $('#station').val(),
+    vehicleType: $('#vehicleModelSelect').val(),   // Captures the chosen Category name (e.g., "Car")
+    quota: parseInt(assignedQuota, 10)            // Maps the numeric volume value (e.g., 20)
+  };
+
+  $.ajax({
+    url: '/api/vehicles',
+    method: 'POST',
+    contentType: 'application/json',
+    data: JSON.stringify(formData),
+    success: function () {
+      loadVehicles(); // Instantly refresh table data grid dynamically
+      $('#vehicleRegForm')[0].reset();
+      $('#email').val(user.email);
+      alert('Vehicle Registered Successfully!');
+    },
+    error: function(xhr) {
+      console.error("Server Registration Refusal Payload:", xhr.responseJSON);
+      alert('Error: ' + (xhr.responseJSON?.details || xhr.responseJSON?.error || 'Registration failed'));
+    }
+  });
+});
+
+
+
+    // Execution loop entries on init
+    loadVehicles();
+    loadStations();
+    loadVehicleModels(); // Dynamically populate dropdown fields
+  });
+</script>
+
 
 </body>
 

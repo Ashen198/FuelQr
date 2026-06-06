@@ -157,8 +157,10 @@
                           <input type="text" id="modelName" class="form-control py-2" placeholder="Enter Vehicle Category" required>
                       </div>
                       <div class="mb-4">
-                          <label class="form-label small fw-medium text-secondary">Fuel Quota (Liters)</label>
-                          <input type="number" id="modelQuota" class="form-control py-2" placeholder="e.g. 20" required>
+                       <label class="form-label small fw-medium text-secondary">Select Assigned Fuel Quota Configuration</label>
+                       <select id="modelQuota" class="form-select py-2" required>
+                           <option value="" disabled selected>-- Loading Quotas from System --</option>
+                       </select>
                       </div>
                       <div class="d-flex gap-2">
                           <button type="button" class="btn btn-outline-secondary w-100 py-2" data-bs-dismiss="modal">Cancel</button>
@@ -171,7 +173,7 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
-  <script>
+  <!-- <script>
       $(document).ready(function() {
           let modelData = [];
           const modelModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modelModal'));
@@ -264,6 +266,143 @@
           // Initial execution loop hook
           loadModels();
       });
-  </script>
+  </script> -->
+
+
+<script>
+  $(document).ready(function() {
+    let modelData = [];
+    const modelModal = bootstrap.Modal.getOrCreateInstance(document.getElementById('modelModal'));
+
+    // --- NEW FUNCTION: Fetch system quotas from quotaAdmin configurations ---
+    function populateQuotaDropdown() {
+        $.get('/api/quotas', function(quotas) {
+            let optionsHtml = '<option value="" disabled selected>-- Select an active Quota --</option>';
+            
+            if (!quotas || quotas.length === 0) {
+                optionsHtml = '<option value="" disabled>No quotas configured. Add one in Quota Admin first.</option>';
+            } else {
+                quotas.forEach(q => {
+                    // Saves the numeric volume value as the option value, displaying the friendly name and limit
+                    optionsHtml += `<option value="${q.allowedLiters}">${q.vehicleType} (${q.allowedLiters} L)</option>`;
+                });
+            }
+            $('#modelQuota').html(optionsHtml);
+        }).fail(function() {
+            console.error("Could not pull existing quota settings to build selection elements.");
+            $('#modelQuota').html('<option value="" disabled>Error fetching operational system data</option>');
+        });
+    }
+
+    // Load models into the main data-grid table
+    function loadModels() {
+        $.get('/api/vehicle-models', function(models) {
+            modelData = models;
+            let html = '';
+            if(models.length === 0) {
+                html = `<tr><td colspan="3" class="text-center text-muted py-4">No vehicle models registered yet.</td></tr>`;
+            } else {
+                models.forEach(m => {
+                    html += `
+                        <tr>
+                            <td class="fw-bold text-dark py-3">${m.modelName}</td>
+                            <td class="py-3"><span class="badge bg-secondary bg-opacity-10 text-dark px-3 py-2 fs-6 fw-normal">${m.quota} L</span></td>
+                            <td class="text-end py-3 pe-3">
+                                <button class="btn btn-sm btn-outline-primary me-2 model-edit-btn" data-id="${m.id}" data-name="${m.modelName}" data-quota="${m.quota}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger model-delete-btn" data-id="${m.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>`;
+                });
+            }
+            $('#modelTableBody').html(html);
+        }).fail(function() {
+            console.error("Failed to sync structural models across local storage arrays.");
+        });
+    }
+
+    // Handle Form submission configurations
+    $('#modelForm').on('submit', function(e) {
+        e.preventDefault();
+        const id = $('#modelId').val();
+        const data = {
+            modelName: $('#modelName').val(),
+            quota: parseInt($('#modelQuota').val(), 10) // Reads the numeric value from the active option element
+        };
+        const url = id ? `/api/vehicle-models/${id}` : '/api/vehicle-models';
+        
+        $.ajax({
+            url: url,
+            type: id ? 'PUT' : 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            success: function() { 
+                modelModal.hide();
+                resetModelForm(); 
+                loadModels(); 
+            }
+        });
+    });
+
+    // Reset settings before opening an Add Model action modal
+    $('#addNewModelBtn').on('click', function() {
+        resetModelForm();
+        populateQuotaDropdown(); // Re-fetch list options to pick up fresh creations seamlessly
+        modelModal.show();
+    });
+
+    // Wire Edit Button interactions safely
+    $(document).on('click', '.model-edit-btn', function() {
+        resetModelForm();
+        const currentQuotaVal = $(this).attr('data-quota');
+        
+        // Ensure dropdown lists are pre-built, then bind current targets
+        $.get('/api/quotas', function(quotas) {
+            let optionsHtml = '<option value="" disabled>-- Select an active Quota --</option>';
+            quotas.forEach(q => {
+                optionsHtml += `<option value="${q.allowedLiters}">${q.vehicleType} (${q.allowedLiters} L)</option>`;
+            });
+            $('#modelQuota').html(optionsHtml);
+            
+            // Set fields to values of row being edited
+            $('#modelId').val($(this).attr('data-id'));
+            $('#modelName').val($(this).attr('data-name'));
+            $('#modelQuota').val(currentQuotaVal); // Matches and sets selection
+        }.bind(this));
+
+        $('#modelFormTitle').text('Edit Vehicle Model');
+        $('#modelSubmitBtn').text('Update Model');
+        modelModal.show();
+    });
+
+    // Wire Remove Actions safely
+    $(document).on('click', '.model-delete-btn', function() {
+        const modelId = $(this).attr('data-id');
+        if(confirm('Delete this model?')) {
+            $.ajax({
+                url: `/api/vehicle-models/${modelId}`,
+                type: 'DELETE',
+                success: function() {
+                    loadModels();
+                }
+            });
+        }
+    });
+
+    function resetModelForm() {
+        $('#modelId').val('');
+        $('#modelForm')[0].reset();
+        $('#modelFormTitle').text('Add Vehicle Model');
+        $('#modelSubmitBtn').text('Save Model');
+    }
+
+    // Initial run loops on view landing configurations
+    loadModels();
+    populateQuotaDropdown();
+});
+</script>
 </body>
 </html>
