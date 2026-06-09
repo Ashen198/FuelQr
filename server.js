@@ -9,11 +9,10 @@ const Station = require('./models/Station');
 
 const app = express();
 
-// Middleware
+
 app.use(express.json());
 
 
-// vehicle Model page process
 
 const MONGO_URI = 'mongodb://localhost:27017/fuelQrDB';
 
@@ -21,13 +20,11 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('Connected to MongoDB successfully!'))
   .catch(err => console.error('MongoDB connection error:', err));
 
-// 2. Define Mongoose Schema and Model
 const VehicleModelSchema = new mongoose.Schema({
   modelName: { type: String, required: true },
   quota: { type: Number, required: true }
 }, {
   timestamps: true,
-  // Automatically transforms MongoDB's default _id to id in JSON outputs to match your frontend code
   toJSON: {
     transform: (doc, ret) => {
       ret.id = ret._id.toString();
@@ -40,7 +37,6 @@ const VehicleModelSchema = new mongoose.Schema({
 const VehicleModel = mongoose.model('VehicleModel', VehicleModelSchema);
 
 
-// 3. POST Endpoint - Create a new vehicle model
 app.post('/api/vehicle-models', async (req, res) => {
   try {
     const { modelName, quota } = req.body;
@@ -60,7 +56,6 @@ app.post('/api/vehicle-models', async (req, res) => {
 });
 
 
-// 4. GET Endpoint - Fetch all vehicle models
 app.get('/api/vehicle-models', async (req, res) => {
   try {
     const models = await VehicleModel.find().sort({ createdAt: -1 });
@@ -72,7 +67,6 @@ app.get('/api/vehicle-models', async (req, res) => {
 });
 
 
-// 5. PUT Endpoint - Update an existing vehicle model by ID
 app.put('/api/vehicle-models/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -96,7 +90,6 @@ app.put('/api/vehicle-models/:id', async (req, res) => {
 });
 
 
-// 6. DELETE Endpoint - Delete a vehicle model by ID
 app.delete('/api/vehicle-models/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -122,7 +115,6 @@ app.delete('/api/vehicle-models/:id', async (req, res) => {
 
 
 
-// 1. Define the Fuel Type Schema and Model
 const FuelTypeSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, default: '' },
@@ -133,7 +125,6 @@ const FuelTypeSchema = new mongoose.Schema({
 const FuelType = mongoose.model('FuelType', FuelTypeSchema);
 
 
-// 2. GET Endpoint - Fetch all fuel types from MongoDB
 app.get('/api/fueltypes', async (req, res) => {
   try {
     const fuelTypes = await FuelType.find().sort({ createdAt: -1 }); // Newest first
@@ -145,7 +136,6 @@ app.get('/api/fueltypes', async (req, res) => {
 });
 
 
-// 3. POST Endpoint - Create a brand new fuel type record
 app.post('/api/fueltypes', async (req, res) => {
   try {
     const { name, description, price, status } = req.body;
@@ -166,7 +156,6 @@ app.post('/api/fueltypes', async (req, res) => {
 });
 
 
-// 4. PUT Endpoint - Update an existing fuel type details by ID
 app.put('/api/fueltypes/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -175,7 +164,7 @@ app.put('/api/fueltypes/:id', async (req, res) => {
     const updatedFuelType = await FuelType.findByIdAndUpdate(
       id,
       { name, description, price, status },
-      { new: true, runValidators: true } // Returns the modified document instead of the original
+      { new: true, runValidators: true } 
     );
 
     if (!updatedFuelType) {
@@ -190,7 +179,6 @@ app.put('/api/fueltypes/:id', async (req, res) => {
 });
 
 
-// 5. DELETE Endpoint - Permanently drop a fuel type record by ID
 app.delete('/api/fueltypes/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -208,7 +196,6 @@ app.delete('/api/fueltypes/:id', async (req, res) => {
 });
 
 
-// --- AUTH ENDPOINTS ---
 
 app.post('/api/signup', async (req, res) => {
   try {
@@ -247,7 +234,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// --- VEHICLE ENDPOINTS ---
+//vehicle endpoints
 
 app.get('/api/vehicles', async (req, res) => {
   try {
@@ -339,7 +326,8 @@ app.patch('/api/vehicles/:vehicleNo/qr', async (req, res) => {
   }
 });
 
-// --- QUOTA ENDPOINTS ---
+//quota endpoints
+
 app.get('/api/quotas', async (req, res) => {
   try {
     const quotas = await Quota.find().sort({ createdAt: -1 });
@@ -360,12 +348,11 @@ app.post('/api/quotas', async (req, res) => {
   }
 });
 
-// --- STATION ENDPOINTS ---
+//station endpoints
 
 app.get('/api/stations', async (req, res) => {
   try {
     const stations = await Station.find().sort({ name: 1 });
-    // Map _id to id for frontend compatibility
     const formattedStations = stations.map(s => ({
       ...s._doc,
       id: s._id
@@ -410,26 +397,23 @@ app.delete('/api/stations/:id', async (req, res) => {
   }
 });
 
-// Serve static files from specified directories
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, 'Nilakshi', 'Dimanthi')));
 app.use(express.static(path.join(__dirname, 'Ranudi')));
 app.use(express.static(path.join(__dirname, 'Layanga')));
 
-// Explicit routes for root files to avoid serving the entire directory
 app.get('/index.html', (req, res) => res.sendFile(path.join(__dirname, 'index.html')));
 app.get('/admin.html', (req, res) => res.sendFile(path.join(__dirname, 'admin.html')));
 
-// Redirect root to login page
 app.get('/', (req, res) => {
   console.log(">>> Root URL accessed - serving login.html");
   res.sendFile(path.join(__dirname, 'Nilakshi', 'Dimanthi', 'login.html'));
 });
 
-// MongoDB Connection with timeout handling
+// Mongodb connection ,timeout
 console.log(">>> Connecting to MongoDB...");
 mongoose.connect('mongodb://localhost:27017/fuelQrDB', {
-  serverSelectionTimeoutMS: 5000 // Fail fast if MongoDB is not running
+  serverSelectionTimeoutMS: 5000 
 })
   .then(() => {
     console.log('>>> Connected securely to MongoDB.');
@@ -441,12 +425,12 @@ mongoose.connect('mongodb://localhost:27017/fuelQrDB', {
     console.error('>>> Please ensure MongoDB is running on your machine (localhost:27017)');
   });
 
-// --- MIGRATION LOGIC ---
+// migration
 const JSON_PATH = path.join(__dirname, 'Nilakshi', 'Dimanthi', 'signup.json');
 
 async function migrateUsers() {
   try {
-    // 1. Always ensure the default admin exists
+    // ensure the default admin 
     const adminExists = await User.findOne({ email: 'admin@fuel.com' });
     if (!adminExists) {
       const admin = new User({
@@ -463,7 +447,6 @@ async function migrateUsers() {
       console.log(">>> Admin role restored for admin@fuel.com");
     }
 
-    // 2. Migrate from signup.json
     if (fs.existsSync(JSON_PATH)) {
       const data = JSON.parse(fs.readFileSync(JSON_PATH, 'utf8'));
       if (data.users && Array.isArray(data.users)) {
@@ -537,7 +520,7 @@ function updateJson(newUser) {
 
 
 
-// Start Server
+// Starting the server
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`>>> Server is running!`);
