@@ -417,7 +417,7 @@
     </div>
   </div>
 
-   <script>
+   <!-- <script>
     $(document).ready(function () {
       const user = JSON.parse(localStorage.getItem('currentUser'));
       $('#userName').text(user.fullname);
@@ -537,7 +537,7 @@
       loadVehicles();
       loadStations();
     });
-  </script> 
+  </script>  -->
 
 <script>
   $(document).ready(function () {
@@ -549,6 +549,66 @@
       localStorage.removeItem('currentUser');
       window.location.href = '/';
     });
+
+
+
+
+    function loadFuelTypes() {
+  $.ajax({
+    url: 'http://localhost:3000/api/fueltypes', // Maps to the API endpoint used in fueltype.html
+    method: 'GET',
+    success: function (res) {
+      // Normalize response array structure to match fueltype.html logic
+      const fuelTypes = Array.isArray(res) ? res : (res.fuelTypes || []);
+      
+      const fuelTypeSelect = $('#fuelType');
+      const editFuelTypeSelect = $('#editFuelType');
+      
+      // Clear out old static HTML options, keeping the primary default placeholder
+      fuelTypeSelect.find('option:not(:first)').remove();
+      editFuelTypeSelect.find('option:not(:first)').remove();
+      
+      // Loop through and append only Active fuel types to the selection elements
+      fuelTypes.forEach(fuel => {
+        if (fuel.status === 'Active') {
+          const opt = `<option value="${fuel.name}">${fuel.name}</option>`;
+          fuelTypeSelect.append(opt);
+          editFuelTypeSelect.append(opt);
+        }
+      });
+    },
+    error: function (xhr) {
+      console.error("Failed to dynamically populate fuel types menu options:", xhr);
+    }
+  });
+}
+
+
+    function loadStations() {
+  $.ajax({
+    url: '/api/stations',
+    method: 'GET',
+    success: function (stations) {
+      const stationSelect = $('#station');
+      const editStationSelect = $('#editStation');
+      
+      // Clear all options except the first placeholder option
+      stationSelect.find('option:not(:first)').remove();
+      editStationSelect.find('option:not(:first)').remove();
+      
+      // Loop through each station object received from the backend database API
+      stations.forEach(station => {
+        // station.name corresponds to the input property captured in station.html
+        const opt = `<option value="${station.name}">${station.name}</option>`;
+        stationSelect.append(opt);
+        editStationSelect.append(opt);
+      });
+    },
+    error: function(xhr) {
+      console.error("Failed to load stations into dropdown options:", xhr);
+    }
+  });
+}
 
     function loadVehicleModels() {
       $.ajax({
@@ -783,6 +843,8 @@ $('#vehicleRegForm').on('submit', function (e) {
     loadVehicles();
     loadStations();
     loadVehicleModels(); // Dynamically populate dropdown fields
+    loadFuelTypes();
+
   });
 </script>
 

@@ -24,7 +24,6 @@
       color: #000;
     }
 
-    /* HEADER */
     .top-header {
       background: #fff;
       padding: 25px 40px;
@@ -47,7 +46,7 @@
       font-weight: 500;
     }
 
-    /* NAVBAR */
+  
     .navbar {
       background: #fff;
       padding: 20px 40px;
@@ -68,12 +67,10 @@
     }
 
 
-    /* MAIN CONTAINER */
     .container {
       padding: 50px 40px;
     }
 
-    /* CARD styling restored */
     .card {
       background: #fff;
       border-radius: 20px;
@@ -95,7 +92,6 @@
       margin-bottom: 35px;
     }
 
-    /* TABLE styling restored */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -133,7 +129,6 @@
       display: inline-block;
     }
 
-    /* Form styling matching the design language */
     .form-group-container {
       display: flex;
       flex-wrap: wrap;
@@ -266,25 +261,23 @@
       const quotaForm = document.getElementById('quotaForm');
       const quotaTableBody = document.getElementById('quotaTableBody');
 
-      // 1. Fetch data asynchronously from MongoDB via REST API
+      //getting data from mongo using rest api
       async function loadQuotas() {
         try {
           const response = await fetch('/api/quotas');
           const quotas = await response.json();
 
-          quotaTableBody.innerHTML = ''; // Wipe old row data safely
+          quotaTableBody.innerHTML = '';
 
           if (!quotas || quotas.length === 0) {
             quotaTableBody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #6b7280; padding: 30px;">No quotas found in the system.</td></tr>`;
             return;
           }
 
-          // Build rows dynamically using fetched JSON
           quotas.forEach(quota => {
             const row = document.createElement('tr');
             row.style.borderBottom = "1px solid #e5e7eb";
 
-            // Extracts last 6 characters of MongoDB ObjectId for clean tracking numbers
             const shortId = quota._id ? quota._id.substring(18) : 'N/A';
 
             row.innerHTML = `
@@ -300,7 +293,7 @@
         }
       }
 
-      // 2. Post new form inputs as JSON to Node.js backend
+      //post new form inputs as JSON to Node js 
       quotaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
@@ -321,8 +314,8 @@
 
           if (response.ok) {
             alert('Quota saved successfully!');
-            quotaForm.reset(); // Clear text inputs
-            await loadQuotas(); // Immediately rebuild table rows via AJAX without reloading
+            quotaForm.reset(); 
+            await loadQuotas(); //  rebuilds table rows using ajax without reloading
           } else {
             const err = await response.json();
             alert('Server rejected submission: ' + (err.error || 'Unknown Error'));
@@ -333,7 +326,7 @@
         }
       });
 
-      // Run on page initialization
+      
       loadQuotas();
     });
   </script>
