@@ -169,6 +169,11 @@
         gap: 20px;
       }
     }
+
+    #vehicleSearch:focus {
+      border-color: #2563eb !important;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
   </style>
 </head>
 
@@ -218,6 +223,13 @@
       <h2 class="table-title">👥 Registered Vehicles (<span id="vehicleCount">0</span>)</h2>
       <p class="table-subtitle">All vehicles registered in the system across all users</p>
 
+      <!-- Modern Search Input -->
+      <div style="margin-bottom: 25px; position: relative;">
+        <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 18px; top: 16px; color: #9ca3af;"></i>
+        <input type="text" id="vehicleSearch" placeholder="Search by name, vehicle type, registration no, station, email, fuel type, or NIC..." 
+               style="width: 100%; padding: 12px 12px 12px 48px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" />
+      </div>
+
       <table>
         <thead>
           <tr>
@@ -247,72 +259,108 @@
         window.location.href = '/';
       });
 
+      let allVehicles = [];
+
       function loadVehicles() {
         $.ajax({
           url: `/api/vehicles?role=admin`,
           method: 'GET',
           success: function (vehicles) {
-            $('#vehicleCount').text(vehicles.length);
-            $('#vehicleTableBody').empty();
-
-            if (vehicles.length === 0) {
-              $('#vehicleTableBody').append(`<tr><td colspan="11" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
-              return;
-            }
-
-            vehicles.forEach(function (vehicle, index) {
-              const isNotAvailable = !vehicle.qrString || vehicle.qrString === "Not Available";
-              const qrTargetId = `table-qr-${index}`;
-
-              const qrDisplay = isNotAvailable
-                ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
-                : `<div id="${qrTargetId}" style="display: flex; justify-content: center; align-items: center; min-height: 70px;"></div>`;
-
-              const rowHtml = `
-                <tr>
-                    <td class="reg-no-bold">${vehicle.vehicleNo}</td>
-                    <td>${vehicle.ownerName}</td>
-                    <td>${vehicle.ownerEmail}</td>
-                    <td>${vehicle.vehicleModel}</td>
-                    <td>${vehicle.nic}</td>
-                    <td>${vehicle.fuelType}</td>
-                    <td>${vehicle.station}</td>
-                    <td>${vehicle.quota}L</td>
-                    <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
-                    <td><span class="status-badge">Active</span></td>
-                    <td style="text-align:center;">
-                      <button class="btn-delete" data-id="${vehicle._id}" data-no="${vehicle.vehicleNo}">
-                        <i class="fa-solid fa-trash"></i> Delete
-                      </button>
-                    </td>
-                </tr>
-              `;
-              $('#vehicleTableBody').append(rowHtml);
-
-              if (!isNotAvailable) {
-                setTimeout(() => {
-                  const targetElement = document.getElementById(qrTargetId);
-                  if (targetElement) {
-                    new QRCode(targetElement, {
-                      text: JSON.stringify({
-                        vehicleNo: vehicle.vehicleNo,
-                        fuelType: vehicle.fuelType,
-                        quota: vehicle.quota,
-                        qrCodeString: vehicle.qrString
-                      }),
-                      width: 60,
-                      height: 60,
-                      colorDark: "#000000",
-                      colorLight: "#ffffff",
-                      correctLevel: QRCode.CorrectLevel.M
-                    });
-                  }
-                }, 100);
-              }
-            });
+            allVehicles = vehicles;
+            displayVehicles(vehicles);
           }
         });
       }
+
+      function displayVehicles(vehicles) {
+        $('#vehicleCount').text(vehicles.length);
+        $('#vehicleTableBody').empty();
+
+        if (vehicles.length === 0) {
+          $('#vehicleTableBody').append(`<tr><td colspan="11" style="text-align:center; padding:30px;">No vehicles found.</td></tr>`);
+          return;
+        }
+
+        vehicles.forEach(function (vehicle, index) {
+          const isNotAvailable = !vehicle.qrString || vehicle.qrString === "Not Available";
+          const qrTargetId = `table-qr-${index}`;
+
+          const qrDisplay = isNotAvailable
+            ? '<span style="color: #ef4444; font-style: italic; font-weight: 600;">Not Available</span>'
+            : `<div id="${qrTargetId}" style="display: flex; justify-content: center; align-items: center; min-height: 70px;"></div>`;
+
+          const rowHtml = `
+            <tr>
+                <td class="reg-no-bold">${vehicle.vehicleNo}</td>
+                <td>${vehicle.ownerName}</td>
+                <td>${vehicle.ownerEmail}</td>
+                <td>${vehicle.vehicleModel}</td>
+                <td>${vehicle.nic}</td>
+                <td>${vehicle.fuelType}</td>
+                <td>${vehicle.station}</td>
+                <td>${vehicle.quota}L</td>
+                <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
+                <td><span class="status-badge">Active</span></td>
+                <td style="text-align:center;">
+                  <button class="btn-delete" data-id="${vehicle._id}" data-no="${vehicle.vehicleNo}">
+                    <i class="fa-solid fa-trash"></i> Delete
+                  </button>
+                </td>
+            </tr>
+          `;
+          $('#vehicleTableBody').append(rowHtml);
+
+          if (!isNotAvailable) {
+            setTimeout(() => {
+              const targetElement = document.getElementById(qrTargetId);
+              if (targetElement) {
+                new QRCode(targetElement, {
+                  text: JSON.stringify({
+                    vehicleNo: vehicle.vehicleNo,
+                    fuelType: vehicle.fuelType,
+                    quota: vehicle.quota,
+                    qrCodeString: vehicle.qrString
+                  }),
+                  width: 60,
+                  height: 60,
+                  colorDark: "#000000",
+                  colorLight: "#ffffff",
+                  correctLevel: QRCode.CorrectLevel.M
+                });
+              }
+            }, 100);
+          }
+        });
+      }
+
+      // Live search filter
+      $('#vehicleSearch').on('input', function () {
+        const searchTerm = $(this).val().toLowerCase().trim();
+        if (!searchTerm) {
+          displayVehicles(allVehicles);
+          return;
+        }
+
+        const filtered = allVehicles.filter(vehicle => {
+          const ownerName = (vehicle.ownerName || '').toLowerCase();
+          const vehicleType = (vehicle.vehicleType || '').toLowerCase();
+          const vehicleNo = (vehicle.vehicleNo || '').toLowerCase();
+          const station = (vehicle.station || '').toLowerCase();
+          const ownerEmail = (vehicle.ownerEmail || '').toLowerCase();
+          const fuelType = (vehicle.fuelType || '').toLowerCase();
+          const nic = (vehicle.nic || '').toLowerCase();
+
+          return ownerName.includes(searchTerm) ||
+                 vehicleType.includes(searchTerm) ||
+                 vehicleNo.includes(searchTerm) ||
+                 station.includes(searchTerm) ||
+                 ownerEmail.includes(searchTerm) ||
+                 fuelType.includes(searchTerm) ||
+                 nic.includes(searchTerm);
+        });
+
+        displayVehicles(filtered);
+      });
 
       loadVehicles();
 

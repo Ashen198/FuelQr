@@ -184,6 +184,67 @@
         font-size: 30px;
       }
     }
+
+    /* Modal Styles */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.4);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(5px);
+      transition: all 0.3s ease-in-out;
+    }
+    .modal-content {
+      background: #fff;
+      border-radius: 20px;
+      padding: 40px;
+      width: 90%;
+      max-width: 800px;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      animation: modalSlide 0.3s ease-out;
+    }
+    @keyframes modalSlide {
+      from { transform: translateY(-30px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-close {
+      position: absolute;
+      top: 20px;
+      right: 25px;
+      font-size: 28px;
+      cursor: pointer;
+      color: #6b7280;
+      background: none;
+      border: none;
+      transition: color 0.2s;
+    }
+    .modal-close:hover {
+      color: #000;
+    }
+    .btn-edit {
+      background: #2563eb;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-edit:hover {
+      background: #1d4ed8;
+    }
   </style>
 </head>
 
@@ -240,7 +301,7 @@
           </div>
           <div class="form-group">
             <label>Email</label>
-            <input type="email" id="email" placeholder="abc@gmail.com" required readonly>
+            <input type="email" id="email" placeholder="abc@gmail.com" required>
           </div>
           <div class="form-group">
             <label>Fuel Type</label>
@@ -286,12 +347,74 @@
               <th>Quota</th>
               <th>QR Code</th>
               <th>Status</th>
+              <th>Action</th>
             </tr>
           </thead>
           <tbody id="vehicleTableBody">
           </tbody>
         </table>
       </div>
+    </div>
+  </div>
+
+  <!-- Edit Vehicle Modal -->
+  <div class="modal-overlay" id="editVehicleModal">
+    <div class="modal-content">
+      <button class="modal-close" id="closeEditModal">&times;</button>
+      <h2 class="card-title" style="font-size: 30px; margin-bottom: 5px;">
+        <i class="fa-solid fa-pen-to-square" style="color: #2563eb;"></i> Edit Vehicle Details
+      </h2>
+      <p class="card-subtitle" style="margin-bottom: 30px; font-size: 16px;">Modify fuel quota system information for this vehicle</p>
+      <form id="editVehicleForm">
+        <input type="hidden" id="editVehicleId">
+        <div class="form-grid" style="gap: 25px 40px;">
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Vehicle Registration No</label>
+            <input type="text" id="editVehicleNo" placeholder="ABC 1234" required>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Vehicle Model</label>
+            <input type="text" id="editVehicleModel" placeholder="Corolla 2020" required>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">First Name</label>
+            <input type="text" id="editFirstName" placeholder="John" required>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Last Name</label>
+            <input type="text" id="editLastName" placeholder="doe" required>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Owner NIC</label>
+            <input type="text" id="editNic" placeholder="123456789V" required>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Email</label>
+            <input type="email" id="editEmail" placeholder="abc@gmail.com" required>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Fuel Type</label>
+            <select id="editFuelType" required>
+              <option value="">Select fuel type</option>
+              <option value="Petrol">Petrol</option>
+              <option value="Diesel">Diesel</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Nearest Fuel Station</label>
+            <select id="editStation" required>
+              <option value="">Select station</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label style="font-size: 16px; margin-bottom: 10px;">Vehicle Type</label>
+            <select id="editVehicleModelSelect" required>
+              <option value="">Select vehicle category</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn" style="margin-top: 30px;">Update Vehicle</button>
+      </form>
     </div>
   </div>
 
@@ -435,16 +558,20 @@
         method: 'GET',
         success: function (models) {
           const modelSelect = $('#vehicleModelSelect');
+          const editModelSelect = $('#editVehicleModelSelect');
           // Wipe out previous entries keeping the placeholder intact
           modelSelect.find('option:not(:first)').remove();
+          editModelSelect.find('option:not(:first)').remove();
           
           models.forEach(model => {
             // Store the quota directly inside a data-quota attribute on each option element
-            modelSelect.append(`
+            const opt = `
               <option value="${model.modelName}" data-quota="${model.quota}">
                 ${model.modelName} (${model.quota}L)
               </option>
-            `);
+            `;
+            modelSelect.append(opt);
+            editModelSelect.append(opt);
           });
         },
         error: function() {
@@ -459,24 +586,31 @@
         method: 'GET',
         success: function (stations) {
           const stationSelect = $('#station');
+          const editStationSelect = $('#editStation');
           stationSelect.find('option:not(:first)').remove();
+          editStationSelect.find('option:not(:first)').remove();
           stations.forEach(station => {
-            stationSelect.append(`<option value="${station.name}">${station.name}</option>`);
+            const opt = `<option value="${station.name}">${station.name}</option>`;
+            stationSelect.append(opt);
+            editStationSelect.append(opt);
           });
         }
       });
     }
+
+    let userVehicles = [];
 
     function loadVehicles() {
       $.ajax({
         url: `/api/vehicles?email=${user.email}&role=${user.role}`,
         method: 'GET',
         success: function (vehicles) {
+          userVehicles = vehicles;
           $('#vehicleCount').text(vehicles.length);
           $('#vehicleTableBody').empty();
 
           if (vehicles.length === 0) {
-            $('#vehicleTableBody').append(`<tr><td colspan="9" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
+            $('#vehicleTableBody').append(`<tr><td colspan="10" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
             return;
           }
 
@@ -499,6 +633,11 @@
                   <td>${vehicle.quota}L</td>
                   <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
                   <td><span class="status-badge">Active</span></td>
+                  <td>
+                    <button class="btn-edit" data-id="${vehicle._id}">
+                      <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                  </td>
               </tr>
             `;
             $('#vehicleTableBody').append(rowHtml);
@@ -548,7 +687,7 @@ $('#vehicleRegForm').on('submit', function (e) {
     ownerName: $('#firstName').val().trim() + ' ' + $('#lastName').val().trim(),
     vehicleModel: $('#vehicleModel').val().trim(), // e.g., "Corolla 2020"
     nic: $('#nic').val().trim(),
-    ownerEmail: user.email,
+    ownerEmail: $('#email').val().trim(),
     fuelType: $('#fuelType').val(),
     station: $('#station').val(),
     vehicleType: $('#vehicleModelSelect').val(),   // Captures the chosen Category name (e.g., "Car")
@@ -573,7 +712,80 @@ $('#vehicleRegForm').on('submit', function (e) {
   });
 });
 
+    // Wire Edit Button interactions safely
+    $(document).on('click', '.btn-edit', function() {
+      const vehicleId = $(this).attr('data-id');
+      const vehicle = userVehicles.find(v => v._id === vehicleId);
+      if (!vehicle) return;
 
+      $('#editVehicleId').val(vehicle._id);
+      $('#editVehicleNo').val(vehicle.vehicleNo);
+      $('#editVehicleModel').val(vehicle.vehicleModel);
+
+      const nameParts = (vehicle.ownerName || '').split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      $('#editFirstName').val(firstName);
+      $('#editLastName').val(lastName);
+
+      $('#editNic').val(vehicle.nic);
+      $('#editEmail').val(vehicle.ownerEmail);
+      $('#editFuelType').val(vehicle.fuelType);
+      $('#editStation').val(vehicle.station);
+      $('#editVehicleModelSelect').val(vehicle.vehicleType);
+
+      $('#editVehicleModal').css('display', 'flex');
+    });
+
+    $('#closeEditModal').on('click', function() {
+      $('#editVehicleModal').hide();
+    });
+
+    $(window).on('click', function(e) {
+      if ($(e.target).is('#editVehicleModal')) {
+        $('#editVehicleModal').hide();
+      }
+    });
+
+    $('#editVehicleForm').on('submit', function (e) {
+      e.preventDefault();
+
+      const selectedOption = $('#editVehicleModelSelect').find('option:selected');
+      const assignedQuota = selectedOption.attr('data-quota');
+
+      if (!assignedQuota) {
+        alert('Please select a valid Vehicle Type category.');
+        return;
+      }
+
+      const vehicleId = $('#editVehicleId').val();
+      const formData = {
+        vehicleNo: $('#editVehicleNo').val().trim(),
+        ownerName: $('#editFirstName').val().trim() + ' ' + $('#editLastName').val().trim(),
+        vehicleModel: $('#editVehicleModel').val().trim(),
+        nic: $('#editNic').val().trim(),
+        ownerEmail: $('#editEmail').val().trim(),
+        fuelType: $('#editFuelType').val(),
+        station: $('#editStation').val(),
+        vehicleType: $('#editVehicleModelSelect').val(),
+        quota: parseInt(assignedQuota, 10)
+      };
+
+      $.ajax({
+        url: `/api/vehicles/${vehicleId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(formData),
+        success: function () {
+          loadVehicles();
+          $('#editVehicleModal').hide();
+          alert('Vehicle Updated Successfully!');
+        },
+        error: function(xhr) {
+          alert('Error: ' + (xhr.responseJSON?.details || xhr.responseJSON?.error || 'Update failed'));
+        }
+      });
+    });
 
     // Execution loop entries on init
     loadVehicles();
