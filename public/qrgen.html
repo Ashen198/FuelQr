@@ -104,7 +104,7 @@
         </div>
     </div>
 
-    
+
 
 
     <div class="custom-navbar">
@@ -158,9 +158,9 @@
                     return;
                 }
 
-                // 1. Fetch vehicle details to verify existence
+                // fetch vehicle details
                 $.ajax({
-                    url: `/api/vehicles?role=admin`, // Fetch all to find the specific one
+                    url: `/api/vehicles?role=admin`, // checks the user is admin or not
                     method: 'GET',
                     success: function (vehicles) {
                         const vehicle = vehicles.find(v => v.vehicleNo.toLowerCase().replace(/\s/g, '') === vehicleNumber.toLowerCase().replace(/\s/g, ''));
@@ -170,17 +170,17 @@
                             return;
                         }
 
-                        // 2. Generate a random payload tracking code
+                        // generate a random unique code
                         let generatedCode = "QR-" + Math.floor(1000000000 + Math.random() * 9000000000) + "-" + vehicle.vehicleNo.toUpperCase().replace(/\s/g, '');
 
-                        // 3. Update vehicle on backend
+                        // update backend
                         $.ajax({
                             url: `/api/vehicles/${vehicle.vehicleNo}/qr`,
                             method: 'PATCH',
                             contentType: 'application/json',
                             data: JSON.stringify({ qrString: generatedCode }),
                             success: function (updatedVehicle) {
-                                // 4. Draw QR Code
+                                // visual QR code
                                 $("#qrcode").html("");
                                 new QRCode(document.getElementById("qrcode"), {
                                     text: JSON.stringify({
