@@ -140,6 +140,22 @@
       display: inline-block;
     }
 
+    .btn-delete {
+      background: #ef4444;
+      color: #fff;
+      border: none;
+      padding: 6px 14px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: #b91c1c;
+    }
+
     @media(max-width:900px) {
       .welcome-title {
         font-size: 35px;
@@ -215,6 +231,7 @@
             <th>Quota</th>
             <th>QR Code</th>
             <th>Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody id="vehicleTableBody">
@@ -239,7 +256,7 @@
             $('#vehicleTableBody').empty();
 
             if (vehicles.length === 0) {
-              $('#vehicleTableBody').append(`<tr><td colspan="10" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
+              $('#vehicleTableBody').append(`<tr><td colspan="11" style="text-align:center; padding:30px;">No vehicles registered yet.</td></tr>`);
               return;
             }
 
@@ -263,6 +280,11 @@
                     <td>${vehicle.quota}L</td>
                     <td style="text-align: center; vertical-align: middle; width: 130px;">${qrDisplay}</td>
                     <td><span class="status-badge">Active</span></td>
+                    <td style="text-align:center;">
+                      <button class="btn-delete" data-id="${vehicle._id}" data-no="${vehicle.vehicleNo}">
+                        <i class="fa-solid fa-trash"></i> Delete
+                      </button>
+                    </td>
                 </tr>
               `;
               $('#vehicleTableBody').append(rowHtml);
@@ -293,6 +315,28 @@
       }
 
       loadVehicles();
+
+      // --- Delete vehicle handler ---
+      $(document).on('click', '.btn-delete', function () {
+        const vehicleId = $(this).attr('data-id');
+        const vehicleNo = $(this).attr('data-no');
+        console.log('Deleting vehicle ID:', vehicleId);
+        if (!confirm(`Are you sure you want to permanently delete vehicle "${vehicleNo}"?\nThis cannot be undone.`)) return;
+
+        $.ajax({
+          url: `/api/vehicles/${vehicleId}`,
+          method: 'DELETE',
+          success: function () {
+            alert(`Vehicle ${vehicleNo} has been deleted.`);
+            loadVehicles();
+          },
+          error: function (xhr) {
+            console.error('Delete error:', xhr.status, xhr.responseText);
+            const msg = xhr.responseJSON?.error || xhr.responseJSON?.message || xhr.responseText || 'Unknown error';
+            alert('Delete failed (' + xhr.status + '): ' + msg);
+          }
+        });
+      });
     });
   </script>
 </body>
