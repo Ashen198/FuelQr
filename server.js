@@ -12,29 +12,26 @@ const app = express();
 // Middleware
 app.use(express.json());
 
+// MongoDB connection URI (Atlas connection with default database 'fuelQR')
+const MONGO_URI = 'mongodb+srv://fuelQR:abcd@cluster0.bpqinrj.mongodb.net/fuelQR?retryWrites=true&w=majority';
+
 
 // vehicle Model page process
 
-const MONGO_URI = 'mongodb://localhost:27017/fuelQrDB'; 
-
-mongoose.connect(MONGO_URI)
-    .then(() => console.log('Connected to MongoDB successfully!'))
-    .catch(err => console.error('MongoDB connection error:', err));
-
 // 2. Define Mongoose Schema and Model
 const VehicleModelSchema = new mongoose.Schema({
-    modelName: { type: String, required: true },
-    quota: { type: Number, required: true }
-}, { 
-    timestamps: true,
-    // Automatically transforms MongoDB's default _id to id in JSON outputs to match your frontend code
-    toJSON: {
-        transform: (doc, ret) => {
-            ret.id = ret._id.toString();
-            delete ret._id;
-            delete ret.__v;
-        }
+  modelName: { type: String, required: true },
+  quota: { type: Number, required: true }
+}, {
+  timestamps: true,
+  // Automatically transforms MongoDB's default _id to id in JSON outputs to match your frontend code
+  toJSON: {
+    transform: (doc, ret) => {
+      ret.id = ret._id.toString();
+      delete ret._id;
+      delete ret.__v;
     }
+  }
 });
 
 const VehicleModel = mongoose.model('VehicleModel', VehicleModelSchema);
@@ -42,75 +39,75 @@ const VehicleModel = mongoose.model('VehicleModel', VehicleModelSchema);
 
 // 3. POST Endpoint - Create a new vehicle model
 app.post('/api/vehicle-models', async (req, res) => {
-    try {
-        const { modelName, quota } = req.body;
+  try {
+    const { modelName, quota } = req.body;
 
-        if (!modelName || !quota) {
-            return res.status(400).json({ status: 'error', message: 'Model name and quota are required' });
-        }
-
-        const newModel = new VehicleModel({ modelName, quota });
-        await newModel.save();
-
-        res.json({ status: 'success', message: 'Vehicle model added successfully', data: newModel });
-    } catch (err) {
-        console.error('Error saving model:', err);
-        res.status(500).json({ status: 'error', message: 'Failed to save model to database' });
+    if (!modelName || !quota) {
+      return res.status(400).json({ status: 'error', message: 'Model name and quota are required' });
     }
+
+    const newModel = new VehicleModel({ modelName, quota });
+    await newModel.save();
+
+    res.json({ status: 'success', message: 'Vehicle model added successfully', data: newModel });
+  } catch (err) {
+    console.error('Error saving model:', err);
+    res.status(500).json({ status: 'error', message: 'Failed to save model to database' });
+  }
 });
 
 
 // 4. GET Endpoint - Fetch all vehicle models
 app.get('/api/vehicle-models', async (req, res) => {
-    try {
-        const models = await VehicleModel.find().sort({ createdAt: -1 });
-        res.json(models);
-    } catch (err) {
-        console.error('Error fetching models:', err);
-        res.status(500).json({ status: 'error', message: 'Failed to retrieve models' });
-    }
+  try {
+    const models = await VehicleModel.find().sort({ createdAt: -1 });
+    res.json(models);
+  } catch (err) {
+    console.error('Error fetching models:', err);
+    res.status(500).json({ status: 'error', message: 'Failed to retrieve models' });
+  }
 });
 
 
 // 5. PUT Endpoint - Update an existing vehicle model by ID
 app.put('/api/vehicle-models/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const { modelName, quota } = req.body;
+  try {
+    const { id } = req.params;
+    const { modelName, quota } = req.body;
 
-        const updatedModel = await VehicleModel.findByIdAndUpdate(
-            id,
-            { modelName, quota },
-            { new: true, runValidators: true }
-        );
+    const updatedModel = await VehicleModel.findByIdAndUpdate(
+      id,
+      { modelName, quota },
+      { new: true, runValidators: true }
+    );
 
-        if (!updatedModel) {
-            return res.status(404).json({ status: 'error', message: 'Model not found' });
-        }
-
-        res.json({ status: 'success', message: 'Vehicle model updated successfully', data: updatedModel });
-    } catch (err) {
-        console.error('Error updating model:', err);
-        res.status(500).json({ status: 'error', message: 'Failed to update model' });
+    if (!updatedModel) {
+      return res.status(404).json({ status: 'error', message: 'Model not found' });
     }
+
+    res.json({ status: 'success', message: 'Vehicle model updated successfully', data: updatedModel });
+  } catch (err) {
+    console.error('Error updating model:', err);
+    res.status(500).json({ status: 'error', message: 'Failed to update model' });
+  }
 });
 
 
 // 6. DELETE Endpoint - Delete a vehicle model by ID
 app.delete('/api/vehicle-models/:id', async (req, res) => {
-    try {
-        const { id } = req.params;
-        const deletedModel = await VehicleModel.findByIdAndDelete(id);
+  try {
+    const { id } = req.params;
+    const deletedModel = await VehicleModel.findByIdAndDelete(id);
 
-        if (!deletedModel) {
-            return res.status(404).json({ status: 'error', message: 'Model not found' });
-        }
-
-        res.json({ status: 'success', message: 'Vehicle model removed successfully' });
-    } catch (err) {
-        console.error('Error deleting model:', err);
-        res.status(500).json({ status: 'error', message: 'Failed to delete model' });
+    if (!deletedModel) {
+      return res.status(404).json({ status: 'error', message: 'Model not found' });
     }
+
+    res.json({ status: 'success', message: 'Vehicle model removed successfully' });
+  } catch (err) {
+    console.error('Error deleting model:', err);
+    res.status(500).json({ status: 'error', message: 'Failed to delete model' });
+  }
 });
 
 
@@ -305,7 +302,7 @@ app.post('/api/quotas', async (req, res) => {
     const newQuota = new Quota({ vehicleType, allowedLiters });
     await newQuota.save();
     res.status(201).json(newQuota);
-    } catch (error) {
+  } catch (error) {
     res.status(500).json({ error: 'Failed to save quota', details: error.message });
   }
 });
@@ -378,17 +375,17 @@ app.get('/', (req, res) => {
 
 // MongoDB Connection with timeout handling
 console.log(">>> Connecting to MongoDB...");
-mongoose.connect('mongodb://localhost:27017/fuelQrDB', {
-  serverSelectionTimeoutMS: 5000 // Fail fast if MongoDB is not running
+mongoose.connect(MONGO_URI, {
+  serverSelectionTimeoutMS: 8000 // Timeout if unable to reach Atlas
 })
   .then(() => {
-    console.log('>>> Connected securely to MongoDB.');
+    console.log('>>> Connected securely to MongoDB Atlas.');
     migrateUsers();
     migrateStations();
   })
   .catch(err => {
     console.error('>>> DATABASE CONNECTION ERROR:', err.message);
-    console.error('>>> Please ensure MongoDB is running on your machine (localhost:27017)');
+    console.error('>>> Please ensure your database connection URI is correct and your IP address is whitelisted in MongoDB Atlas.');
   });
 
 // --- MIGRATION LOGIC ---
@@ -493,3 +490,4 @@ app.listen(PORT, () => {
   console.log(`>>> Server is running!`);
   console.log(`>>> Local Access: http://localhost:${PORT}`);
 });
+
