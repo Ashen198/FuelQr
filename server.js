@@ -271,6 +271,18 @@ app.post('/api/vehicles', async (req, res) => {
   }
 });
 
+// DELETE Endpoint - Admin removes a vehicle by its MongoDB _id
+app.delete('/api/vehicles/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const deleted = await Vehicle.findByIdAndDelete(id);
+    if (!deleted) return res.status(404).json({ error: 'Vehicle not found' });
+    res.status(200).json({ message: 'Vehicle deleted successfully' });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to delete vehicle', details: error.message });
+  }
+});
+
 app.patch('/api/vehicles/:vehicleNo/qr', async (req, res) => {
   try {
     const { qrString } = req.body;
