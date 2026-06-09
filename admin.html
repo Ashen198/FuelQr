@@ -193,7 +193,6 @@
     </div>
   </div>
 
-  <!-- Updated Navbar from index.html -->
   <div class="navbar">
     <a href="admin.html" class="nav-item">
       <i class="fa-solid fa-house"></i> Home
@@ -223,11 +222,12 @@
       <h2 class="table-title">👥 Registered Vehicles (<span id="vehicleCount">0</span>)</h2>
       <p class="table-subtitle">All vehicles registered in the system across all users</p>
 
-      <!-- Modern Search Input -->
+      <!-- search -->
       <div style="margin-bottom: 25px; position: relative;">
         <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 18px; top: 16px; color: #9ca3af;"></i>
-        <input type="text" id="vehicleSearch" placeholder="Search by name, vehicle type, registration no, station, email, fuel type, or NIC..." 
-               style="width: 100%; padding: 12px 12px 12px 48px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" />
+        <input type="text" id="vehicleSearch"
+          placeholder="Search by name, vehicle type, registration no, station, email, fuel type, or NIC..."
+          style="width: 100%; padding: 12px 12px 12px 48px; border: 1px solid #d1d5db; border-radius: 10px; font-size: 16px; outline: none; transition: border-color 0.2s, box-shadow 0.2s;" />
       </div>
 
       <table>
@@ -333,7 +333,7 @@
         });
       }
 
-      // Live search filter
+      // search filter
       $('#vehicleSearch').on('input', function () {
         const searchTerm = $(this).val().toLowerCase().trim();
         if (!searchTerm) {
@@ -351,12 +351,12 @@
           const nic = (vehicle.nic || '').toLowerCase();
 
           return ownerName.includes(searchTerm) ||
-                 vehicleType.includes(searchTerm) ||
-                 vehicleNo.includes(searchTerm) ||
-                 station.includes(searchTerm) ||
-                 ownerEmail.includes(searchTerm) ||
-                 fuelType.includes(searchTerm) ||
-                 nic.includes(searchTerm);
+            vehicleType.includes(searchTerm) ||
+            vehicleNo.includes(searchTerm) ||
+            station.includes(searchTerm) ||
+            ownerEmail.includes(searchTerm) ||
+            fuelType.includes(searchTerm) ||
+            nic.includes(searchTerm);
         });
 
         displayVehicles(filtered);
@@ -364,7 +364,7 @@
 
       loadVehicles();
 
-      // --- Delete vehicle handler ---
+      // delete vehicle
       $(document).on('click', '.btn-delete', function () {
         const vehicleId = $(this).attr('data-id');
         const vehicleNo = $(this).attr('data-no');
