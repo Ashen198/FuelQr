@@ -185,7 +185,7 @@
       }
     }
 
-    /* Modal Styles */
+
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -357,7 +357,6 @@
     </div>
   </div>
 
-  <!-- Edit Vehicle Modal -->
   <div class="modal-overlay" id="editVehicleModal">
     <div class="modal-content">
       <button class="modal-close" id="closeEditModal">&times;</button>
@@ -418,7 +417,7 @@
     </div>
   </div>
 
-  <!-- <script>
+   <script>
     $(document).ready(function () {
       const user = JSON.parse(localStorage.getItem('currentUser'));
       $('#userName').text(user.fullname);
@@ -538,7 +537,7 @@
       loadVehicles();
       loadStations();
     });
-  </script> -->
+  </script> 
 
 <script>
   $(document).ready(function () {
@@ -551,7 +550,6 @@
       window.location.href = '/';
     });
 
-    // --- NEW FUNCTION: Fetch categories registered in vehicleModel.html ---
     function loadVehicleModels() {
       $.ajax({
         url: '/api/vehicle-models',
@@ -559,12 +557,10 @@
         success: function (models) {
           const modelSelect = $('#vehicleModelSelect');
           const editModelSelect = $('#editVehicleModelSelect');
-          // Wipe out previous entries keeping the placeholder intact
           modelSelect.find('option:not(:first)').remove();
           editModelSelect.find('option:not(:first)').remove();
           
           models.forEach(model => {
-            // Store the quota directly inside a data-quota attribute on each option element
             const opt = `
               <option value="${model.modelName}" data-quota="${model.quota}">
                 ${model.modelName} (${model.quota}L)
@@ -667,16 +663,14 @@
       });
     }
 
-    // Handle form submissions
+    
     
 $('#vehicleRegForm').on('submit', function (e) {
   e.preventDefault();
 
-  // FIX: Added the dot before find() so jQuery can locate the selected option properly
   const selectedOption = $('#vehicleModelSelect').find('option:selected');
   const assignedQuota = selectedOption.attr('data-quota');
 
-  // Safety fallback check in case no option or an empty option is picked
   if (!assignedQuota) {
     alert('Please select a valid Vehicle Type category.');
     return;
@@ -685,13 +679,13 @@ $('#vehicleRegForm').on('submit', function (e) {
   const formData = {
     vehicleNo: $('#vehicleNo').val().trim(),
     ownerName: $('#firstName').val().trim() + ' ' + $('#lastName').val().trim(),
-    vehicleModel: $('#vehicleModel').val().trim(), // e.g., "Corolla 2020"
+    vehicleModel: $('#vehicleModel').val().trim(), 
     nic: $('#nic').val().trim(),
     ownerEmail: $('#email').val().trim(),
     fuelType: $('#fuelType').val(),
     station: $('#station').val(),
-    vehicleType: $('#vehicleModelSelect').val(),   // Captures the chosen Category name (e.g., "Car")
-    quota: parseInt(assignedQuota, 10)            // Maps the numeric volume value (e.g., 20)
+    vehicleType: $('#vehicleModelSelect').val(),   
+    quota: parseInt(assignedQuota, 10)           
   };
 
   $.ajax({
@@ -700,7 +694,7 @@ $('#vehicleRegForm').on('submit', function (e) {
     contentType: 'application/json',
     data: JSON.stringify(formData),
     success: function () {
-      loadVehicles(); // Instantly refresh table data grid dynamically
+      loadVehicles(); 
       $('#vehicleRegForm')[0].reset();
       $('#email').val(user.email);
       alert('Vehicle Registered Successfully!');
@@ -712,7 +706,6 @@ $('#vehicleRegForm').on('submit', function (e) {
   });
 });
 
-    // Wire Edit Button interactions safely
     $(document).on('click', '.btn-edit', function() {
       const vehicleId = $(this).attr('data-id');
       const vehicle = userVehicles.find(v => v._id === vehicleId);
@@ -787,7 +780,6 @@ $('#vehicleRegForm').on('submit', function (e) {
       });
     });
 
-    // Execution loop entries on init
     loadVehicles();
     loadStations();
     loadVehicleModels(); // Dynamically populate dropdown fields
