@@ -12,11 +12,14 @@ const app = express();
 // Middleware
 app.use(express.json());
 
-// MongoDB connection URI (Atlas connection with default database 'fuelQR')
-const MONGO_URI = 'mongodb+srv://fuelQR:abcd@cluster0.bpqinrj.mongodb.net/fuelQR?retryWrites=true&w=majority';
-
 
 // vehicle Model page process
+
+const MONGO_URI = 'mongodb://localhost:27017/fuelQrDB';
+
+mongoose.connect(MONGO_URI)
+  .then(() => console.log('Connected to MongoDB successfully!'))
+  .catch(err => console.error('MongoDB connection error:', err));
 
 // 2. Define Mongoose Schema and Model
 const VehicleModelSchema = new mongoose.Schema({
@@ -271,18 +274,6 @@ app.post('/api/vehicles', async (req, res) => {
   }
 });
 
-// DELETE Endpoint - Admin removes a vehicle by its MongoDB _id
-app.delete('/api/vehicles/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const deleted = await Vehicle.findByIdAndDelete(id);
-    if (!deleted) return res.status(404).json({ error: 'Vehicle not found' });
-    res.status(200).json({ message: 'Vehicle deleted successfully' });
-  } catch (error) {
-    res.status(500).json({ error: 'Failed to delete vehicle', details: error.message });
-  }
-});
-
 app.patch('/api/vehicles/:vehicleNo/qr', async (req, res) => {
   try {
     const { qrString } = req.body;
@@ -387,17 +378,17 @@ app.get('/', (req, res) => {
 
 // MongoDB Connection with timeout handling
 console.log(">>> Connecting to MongoDB...");
-mongoose.connect(MONGO_URI, {
-  serverSelectionTimeoutMS: 8000 // Timeout if unable to reach Atlas
+mongoose.connect('mongodb://localhost:27017/fuelQrDB', {
+  serverSelectionTimeoutMS: 5000 // Fail fast if MongoDB is not running
 })
   .then(() => {
-    console.log('>>> Connected securely to MongoDB Atlas.');
+    console.log('>>> Connected securely to MongoDB.');
     migrateUsers();
     migrateStations();
   })
   .catch(err => {
     console.error('>>> DATABASE CONNECTION ERROR:', err.message);
-    console.error('>>> Please ensure your database connection URI is correct and your IP address is whitelisted in MongoDB Atlas.');
+    console.error('>>> Please ensure MongoDB is running on your machine (localhost:27017)');
   });
 
 // --- MIGRATION LOGIC ---
